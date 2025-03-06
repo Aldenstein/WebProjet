@@ -78,3 +78,12 @@ body{
   .input-field:focus + .input-label + .input-highlight {
     width: 110%;
   }
+
+.btn{
+  background-color: #ccc;
+  border: 2px solid #184766;
+  padding: 10px;
+  margin-top: 5em;
+  border: none;
+  font-size: 1em;
+}
