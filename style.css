@@ -80,10 +80,18 @@ body{
   }
 
 .btn{
-  background-color: #ccc;
-  border: 2px solid #184766;
-  padding: 10px;
-  margin-top: 5em;
+  background-color:transparent;
   border: none;
+  padding: 10px;
+  border-radius: 500px;
+  margin-top: 5em;
   font-size: 1em;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn img{
+  display: inline-block;
+  justify-content: center;
+  align-items: center;
 }
