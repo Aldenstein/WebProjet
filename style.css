@@ -34,6 +34,7 @@ body{
     position: relative;
     margin-top: 50px;
     width: 80%;
+    left: 20px;
   }
   
   .input-field {
