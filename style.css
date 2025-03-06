@@ -6,7 +6,9 @@
     font-variation-settings:
       "wdth" 100;
 }
-
+html{
+  overflow: hidden;
+}
 body{
     background-color: #e6e6fa;
     justify-content: center;
