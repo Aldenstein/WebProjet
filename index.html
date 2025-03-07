@@ -15,22 +15,24 @@
     <div class="card">
         <h1>Ctrl+Quizz</h1>
         <p>Testez vos connaissances !</p>
-        <div class="input-container">
-            <input placeholder="Pseudo" id="Pseudo" class="input-fichier" type="text">
-            <label for="input-fichier" class="input-label">Pseudo</label>
-            <span class="input-aesthetic"></span>
-        </div>
-        <div class="input-container">
-            <input placeholder="Mot de passe" id="mdp" class="input-fichier" type="password">
-            <label for="input-fichier" class="input-label">Mot de passe</label>
-            <span class="input-aesthetic"></span>
-        </div>
-        <button id="btn" class="btn">             
-            <img src="images/send.png" alt="send" width="40px" height="40px">
-        </button>
-        <button id="btn2" class="btn">             
-            <img src="images/Add User.png" alt="adduser" width="40px" height="40px">
-        </button>
+        <form action="auth.php" method="post">
+            <div class="input-container">
+                <input placeholder="Pseudo" name="pseudo" id="Pseudo" class="input-fichier" type="text" required>
+                <label for="Pseudo" class="input-label">Pseudo</label>
+                <span class="input-aesthetic"></span>
+            </div>
+            <div class="input-container">
+                <input placeholder="Mot de passe" name="mdp" id="mdp" class="input-fichier" type="password" required>
+                <label for="mdp" class="input-label">Mot de passe</label>
+                <span class="input-aesthetic"></span>
+            </div>
+            <button type="submit" name="action" value="login" id="btn" class="btn">             
+                <img src="images/send.png" alt="send" width="40px" height="40px">
+            </button>
+            <button type="submit" name="action" value="register" id="btn2" class="btn">             
+                <img src="images/Add User.png" alt="adduser" width="40px" height="40px">
+            </button>
+        </form>
     </div>
 </body>
 </html>
