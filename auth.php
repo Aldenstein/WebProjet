@@ -22,7 +22,7 @@ if ($action == 'register') {
         echo "User already exists!";
     } else {
         $hashed_password = password_hash($mdp, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (pseudo, mdp) VALUES ('$pseudo', '$hashed_password')";
+        $sql = "INSERT INTO users (pseudo, mdp, active) VALUES ('$pseudo', '$hashed_password', false)";
         if ($conn->query($sql) === TRUE) {
             echo "New user created successfully";
         } else {
