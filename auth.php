@@ -24,8 +24,14 @@ if ($action == 'register') {
         $hashed_password = password_hash($mdp, PASSWORD_DEFAULT);
         $sql = "INSERT INTO users (pseudo, mdp, active) VALUES ('$pseudo', '$hashed_password', false)";
         if ($conn->query($sql) === TRUE) {
-            echo "New user created successfully";
-        } else {
+            echo "<script>
+                    alert('Compte créé avec succès, vous pouvez vous connecter');
+                    document.getElementById('Pseudo').value = '';
+                    document.getElementById('mdp').value = '';
+                  </script>";
+                  header("Location: index.html");
+                  exit();
+      } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
     }
@@ -36,7 +42,12 @@ if ($action == 'register') {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($mdp, $row['mdp'])) {
-            echo "Login successful!";
+if ($row['active'] == 1) {
+                header("Location: creation/creation.html");
+            } else {
+            header("Location: liste/liste.html");
+}
+            exit();
         } else {
             echo "Invalid username or password!";
         }

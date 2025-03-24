@@ -1,0 +1,29 @@
+* {
+    font-family: "Open Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings:
+      "wdth" 100;
+}
+html {
+    overflow: hidden;
+}
+body{
+    background-color: #e6e6fa;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+}
+.card{
+    background-color: #f0f8ff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    width: 400px;
+    height: 300px;
+    margin: 10px;
+    padding: 15px;
+    text-align: center;
+}
