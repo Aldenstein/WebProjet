@@ -3,11 +3,10 @@
     font-optical-sizing: auto;
     font-weight: 500;
     font-style: normal;
-    font-variation-settings:
-      "wdth" 100;
+    font-variation-settings:none;
 }
-html {
-    overflow: hidden;
+html{
+  overflow: hidden;
 }
 body{
     background-color: #e6e6fa;
@@ -17,13 +16,55 @@ body{
     height: 100vh;
     flex-direction: column;
 }
+
 .card{
     background-color: #f0f8ff;
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    width: 400px;
-    height: 300px;
+    width: 300px;
+    height: auto;
     margin: 10px;
     padding: 15px;
     text-align: center;
+}
+
+.card h1{
+    font-size: 2rem;
+}
+
+.input-container {
+    position: relative;
+    margin-top: 20px;
+    width: 80%;
+    left: 20px;
+}
+
+.questions-container {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 300px;
+    background-color: #f0f8ff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    overflow-y: auto;
+    max-height: 90vh;
+}
+
+.questions-container h2 {
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.questions-container ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.questions-container li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #e6e6fa;
+    border-radius: 5px;
 }

@@ -3,9 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Ctrl+Quizz - Creation</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../script.js"></script>
 </head>
 <body>
-    
+    <div class="card">
+        <h1>Ajouter une question</h1>
+        <form action="creation.php" method="post">
+            <div class="input-container">
+                <input placeholder="Numéro de Question" name="numero_question" id="numero_question" class="input-fichier" type="text" required>
+                <label for="numero_question" class="input-label">Numéro de Question</label>
+                <span class="input-aesthetic"></span>
+            </div>
+            <div class="input-container">
+                <input placeholder="Question" name="question" id="question" class="input-fichier" type="text" required>
+                <label for="question" class="input-label">Question</label>
+                <span class="input-aesthetic"></span>
+            </div>
+            <div class="input-container">
+                <input placeholder="Réponse Vraie" name="reponse_v" id="reponse_v" class="input-fichier" type="text" required>
+                <label for="reponse_v" class="input-label">Réponse Vraie</label>
+                <span class="input-aesthetic"></span>
+            </div>
+            <div class="input-container">
+                <input placeholder="Réponse Fausse 1" name="reponse_f1" id="reponse_f1" class="input-fichier" type="text" required>
+                <label for="reponse_f1" class="input-label">Réponse Fausse 1</label>
+                <span class="input-aesthetic"></span>
+            </div>
+            <div class="input-container">
+                <input placeholder="Réponse Fausse 2" name="reponse_f2" id="reponse_f2" class="input-fichier" type="text" required>
+                <label for="reponse_f2" class="input-label">Réponse Fausse 2</label>
+                <span class="input-aesthetic"></span>
+            </div>
+            <button type="submit" id="btn3" class="btn">             
+                <img src="../images/send.png" alt="send" width="40px" height="40px">
+            </button>
+        </form>
+    </div>
+    <div id="questions-container" class="questions-container">
+        <h2>Questions</h2>
+        <!-- Questions will be displayed here -->
+    </div>
+    <script src="../script.js"></script>
 </body>
 </html>
