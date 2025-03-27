@@ -27,16 +27,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
     // Insérer les questions et options dans la table questions
-    $sql = "INSERT INTO questions (quiz_id, question_text, option1, option2, correct_option) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO questions (quiz_id, question_text, option1, option2, option3 ,correct_option) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
 
     foreach ($questions as $index => $question) {
         $option1 = $options[$index][0];
         $option2 = $options[$index][1];
+        $option3 = $options[$index][2];
         $correctOption = $correctOptions[$index];
 
         // Assurez-vous que les variables sont correctement liées
-        $stmt->bind_param("iissi", $quizId, $question, $option1, $option2, $correctOption);
+        $stmt->bind_param("iisssi", $quizId, $question, $option1, $option2, $option3, $correctOption);
         $stmt->execute();
     }
 
