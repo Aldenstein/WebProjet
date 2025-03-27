@@ -1,6 +1,5 @@
 <?php
-session_start();
-
+// Connexion à la base de données
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -8,50 +7,38 @@ $dbname = "projetweb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+// Vérifier la connexion
 if ($conn->connect_error) {
-    die("Erreur de connexion à la base de données : " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// Vérifier si le formulaire pour le titre a été soumis
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['titre'])) {
-    $titre = trim($_POST['titre']);
+// Récupérer les données du formulaire
+$title = $_POST['title'];
+$question = $_POST['question'];
+$option1 = $_POST['option1'];
+$option2 = $_POST['option2'];
+$option3 = $_POST['option3'];
+$correct_option = $_POST['correct_option'];
 
-    if (!empty($titre)) {
-        $stmt = $conn->prepare("INSERT INTO quiz (titre) VALUES (?)");
-        if ($stmt) {
-            $stmt->bind_param("s", $titre);
-            if ($stmt->execute()) {
-                $_SESSION['quiz_id'] = $conn->insert_id;
-                header("Location: creation.html");
-                exit();
-            }
-            $stmt->close();
-        }
-    }
-}
+// Insérer le titre du quiz dans la table quizzes
+$sql_quiz = "INSERT INTO quizzes (title) VALUES ('$title')";
+if ($conn->query($sql_quiz) === TRUE) {
+    // Récupérer l'ID du quiz nouvellement inséré
+    $quiz_id = $conn->insert_id;
 
-// Vérifier si le formulaire pour ajouter une question a été soumis
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['question_text'])) {
-    if (isset($_SESSION['quiz_id'])) {
-        $quiz_id = $_SESSION['quiz_id'];
-        $question_text = $_POST['question_text'];
-        $option1 = $_POST['option1'];
-        $option2 = $_POST['option2'];
-        $option3 = $_POST['option3'];
-        $correct_option = $_POST['correct_option'];
+    // Insérer la question dans la table questions
+    $sql_question = "INSERT INTO questions (quiz_id, question, option1, option2, option3, correct_option)
+                     VALUES ($quiz_id, '$question', '$option1', '$option2', '$option3', $correct_option)";
 
-        if (!empty($question_text) && !empty($option1) && !empty($option2) && !empty($option3) && !empty($correct_option)) {
-            $stmt = $conn->prepare("INSERT INTO questions (quiz_id, question_text, option1, option2, option3, correct_option) VALUES (?, ?, ?, ?, ?, ?)");
-            if ($stmt) {
-                $stmt->bind_param("issssi", $quiz_id, $question_text, $option1, $option2, $option3, $correct_option);
-                $stmt->execute();
-                $stmt->close();
-            }
-        }
+    if ($conn->query($sql_question) === TRUE) {
+        echo "Nouvelle question ajoutée avec succès";
     } else {
-        echo "Aucun quiz sélectionné. Veuillez d'abord enregistrer un titre.";
+        echo "Erreur: " . $sql_question . "<br>" . $conn->error;
     }
+} else {
+    echo "Erreur: " . $sql_quiz . "<br>" . $conn->error;
 }
 
+// Fermer la connexion
 $conn->close();
 ?>

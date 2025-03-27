@@ -10,22 +10,14 @@
 <body>
     <div class="card">
         <h1>Créer un Quiz</h1> 
-
-        <!-- Formulaire pour ajouter le titre -->
-        <form id="title-form" action="creation.php" method="POST">
+        <form id="quizz-form" action="creation.php" method="POST">
             <div class="input-container">
                 <input placeholder="Titre du Quiz" name="titre" id="quiz-title" class="input-fichier" type="text" required>
                 <label for="quiz-title" class="input-label">Titre du Quiz :</label>
                 <span class="input-aesthetic"></span>
             </div>
-            <button type="submit" class="btn">Enregistrer le Titre</button>
-        </form>
-
-        <!-- Formulaire pour ajouter des questions -->
-        <form id="quiz-form" action="creation.php" method="POST">
             <div id="questions-container">
                 <div class="question">
-                    <h3>Question</h3>
                     <div class="input-container">
                         <textarea placeholder="Texte de la question" name="question_text" id="question-1" class="input-fichier" required></textarea>
                         <label for="question-1" class="input-label">Texte de la question :</label>
