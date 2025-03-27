@@ -1,4 +1,9 @@
 <?php
+// Activer l'affichage des erreurs pour le débogage
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Connexion à la base de données
 $servername = "localhost";
 $username = "root";
@@ -14,7 +19,7 @@ if ($conn->connect_error) {
 
 // Vérifier si toutes les données du formulaire sont présentes
 if (!isset($_POST['title'], $_POST['question'], $_POST['option1'], $_POST['option2'], $_POST['option3'], $_POST['correct_option'])) {
-    die("Erreur : Tous les champs du formulaire doivent être remplis.");
+    die("Erreur : Tous les champs du formulaire doivent être remplis. Données reçues : " . print_r($_POST, true));
 }
 
 // Récupérer les données du formulaire
@@ -39,11 +44,8 @@ if ($stmt_quiz->execute()) {
     $stmt_question = $conn->prepare($sql_question);
 
     // Vérifier le type de correct_option dans ta base de données
-    // Si correct_option est un VARCHAR, on le traite comme une chaîne ("s")
-    // Si c'est un INT, on le traite comme un entier ("i")
-    // Ici, je suppose que correct_option est une chaîne (VARCHAR) car tu passes des valeurs comme '2'
     $stmt_question->bind_param("isssss", $quiz_id, $question, $option1, $option2, $option3, $correct_option);
-    
+
     if ($stmt_question->execute()) {
         echo "Nouvelle question ajoutée avec succès";
     } else {
@@ -56,5 +58,7 @@ if ($stmt_quiz->execute()) {
 }
 
 $stmt_quiz->close();
+
+// Fermer la connexion
 $conn->close();
 ?>
