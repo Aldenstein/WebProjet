@@ -1,5 +1,4 @@
 <?php
-// Connexion à la base de données
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -7,12 +6,10 @@ $dbname = "projetweb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Vérifier la connexion
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Récupérer les données du formulaire
 $title = $_POST['title'];
 $question = $_POST['question'];
 $option1 = $_POST['option1'];
@@ -20,25 +17,29 @@ $option2 = $_POST['option2'];
 $option3 = $_POST['option3'];
 $correct_option = $_POST['correct_option'];
 
-// Insérer le titre du quiz dans la table quizzes
-$sql_quiz = "INSERT INTO quizzes (title) VALUES ('$title')";
-if ($conn->query($sql_quiz) === TRUE) {
-    // Récupérer l'ID du quiz nouvellement inséré
+$sql_quiz = "INSERT INTO quizzes (title) VALUES (?)";
+$stmt_quiz = $conn->prepare($sql_quiz);
+$stmt_quiz->bind_param("s", $title); 
+
+if ($stmt_quiz->execute()) {
     $quiz_id = $conn->insert_id;
 
-    // Insérer la question dans la table questions
-    $sql_question = "INSERT INTO questions (quiz_id, question, option1, option2, option3, correct_option)
-                     VALUES ($quiz_id, '$question', '$option1', '$option2', '$option3', $correct_option)";
+    $sql_question = "INSERT INTO questions (quiz_id, question, option1, option2, option3, correct_option) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt_question = $conn->prepare($sql_question);
 
-    if ($conn->query($sql_question) === TRUE) {
+    $stmt_question->bind_param("isssss", $quiz_id, $question, $option1, $option2, $option3, $correct_option);
+
+    if ($stmt_question->execute()) {
         echo "Nouvelle question ajoutée avec succès";
     } else {
-        echo "Erreur: " . $sql_question . "<br>" . $conn->error;
+        echo "Erreur lors de l'insertion de la question : " . $conn->error;
     }
+
+    $stmt_question->close();
 } else {
-    echo "Erreur: " . $sql_quiz . "<br>" . $conn->error;
+    echo "Erreur lors de l'insertion du quiz : " . $conn->error;
 }
 
-// Fermer la connexion
+$stmt_quiz->close();
 $conn->close();
 ?>

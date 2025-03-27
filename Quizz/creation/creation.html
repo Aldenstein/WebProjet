@@ -12,33 +12,33 @@
         <h1>Créer un Quiz</h1> 
         <form id="quizz-form" action="creation.php" method="POST">
             <div class="input-container">
-                <input placeholder="Titre du Quiz" name="titre" id="quiz-title" class="input-fichier" type="text" required>
-                <label for="quiz-title" class="input-label">Titre du Quiz :</label>
+                <input placeholder="Titre du Quiz" name="title" id="title" class="input-fichier" type="text" required>
+                <label for="title" class="input-label">Titre du Quiz :</label>
                 <span class="input-aesthetic"></span>
             </div>
             <div id="questions-container">
                 <div class="question">
                     <div class="input-container">
-                        <textarea placeholder="Texte de la question" name="question_text" id="question-1" class="input-fichier" required></textarea>
-                        <label for="question-1" class="input-label">Texte de la question :</label>
+                        <input placeholder="Question" name="question" id="question" class="input-fichier" type="text" required>
+                        <label for="question" class="input-label">Question :</label>
                         <span class="input-aesthetic"></span>
                     </div>
                     <div class="options">
                         <div class="input-container">
-                            <input placeholder="Option 1" name="option1" id="option-1-1" class="input-fichier" type="text" required>
-                            <label for="option-1-1" class="input-label">Option 1 :</label>
+                            <input placeholder="Option 1" name="option1" id="option1" class="input-fichier" type="text" required>
+                            <label for="option1" class="input-label">Option 1 :</label>
                         </div>
                         <div class="input-container">
-                            <input placeholder="Option 2" name="option2" id="option-1-2" class="input-fichier" type="text" required>
-                            <label for="option-1-2" class="input-label">Option 2 :</label>
+                            <input placeholder="Option 2" name="option2" id="option2" class="input-fichier" type="text" required>
+                            <label for="option2" class="input-label">Option 2 :</label>
                         </div>
                         <div class="input-container">
-                            <input placeholder="Option 3" name="option3" id="option-1-3" class="input-fichier" type="text" required>
-                            <label for="option-1-3" class="input-label">Option 3 :</label>
+                            <input placeholder="Option 3" name="option3" id="option3" class="input-fichier" type="text" required>
+                            <label for="option3" class="input-label">Option 3 :</label>
                         </div>
                         <div class="input-container">
-                            <input placeholder="Option correcte (1, 2 ou 3)" name="correct_option" id="correct-option-1" class="input-fichier" type="number" min="1" max="3" required>
-                            <label for="correct-option-1" class="input-label">Option correcte :</label>
+                            <input placeholder="Option correcte (1, 2 ou 3)" name="correct_option" id="correct_option" class="input-fichier" type="number" min="1" max="3" required>
+                            <label for="correct_option" class="input-label">Option correcte :</label>
                         </div>
                     </div>
                 </div>
