@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Création de Quiz</title>
+    <link rel="stylesheet" href="creation.css">
+</head>
+<body>
+    <div class="card">
+        <h1>Créer un Quiz</h1> 
+        <form id="quiz-form" action="creation.php" method="POST">
+            <div class="input-container">
+                <input placeholder="Titre du Quiz" name="quiz-title" id="quiz-title" class="input-fichier" type="text" required>
+                <label for="quiz-title" class="input-label">Titre du Quiz :</label>
+                <span class="input-aesthetic"></span>
+            </div>
+            <div id="questions-container">
+                <div class="question">
+                    <div class="input-container">
+                        <input placeholder="Question 1" name="questions[]" id="question-1" class="input-fichier" type="text" required>
+                        <label for="question-1" class="input-label">Question 1 :</label>
+                        <span class="input-aesthetic"></span>
+                    </div>
+                        <div class="options">
+                            <div class="input-container">
+                                <input placeholder="Option 1" name="options-1[]" id="option-1-1" class="input-fichier" type="text" required>
+                                <label for="option-1-1" class="input-label">Option 1 :</label>
+                                <span class="input-aesthetic"></span>
+                            </div>
+                            <div class="input-container">
+                                <input placeholder="Option 2" name="options-1[]" id="option-1-2" class="input-fichier" type="text" required>
+                                <label for="option-1-2" class="input-label">Option 2 :</label>
+                                <span class="input-aesthetic"></span>
+                            </div>
+                                <label for="correct-option-1">Réponse correcte :</label>
+                                <select id="correct-option-1" name="correct-options[]" required>
+                                    <option value="1">Option 1</option>
+                                    <option value="2">Option 2</option>
+                                </select>
+                        </div>
+                </div>
+            </div>
+            <button type="button" id="add-question">Ajouter une question</button>
+            <button type="submit">Enregistrer le Quiz</button>
+        </form>
+    </div>
+    <script src="creation.js"></script>
+</body>
+</html>

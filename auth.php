@@ -49,7 +49,7 @@ if ($row['active'] == 1) {
 }
             exit();
         } else {
-            echo "Invalid username or password!";
+            header("Location: invalide/invalide.html");
         }
     } else {
         echo "Invalid username or password!";
