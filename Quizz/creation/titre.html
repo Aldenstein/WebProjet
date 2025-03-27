@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ctrl+Quizz</title>
+    <link rel="stylesheet" href="titre.css">
+    <link rel="icon" href="/images/icone.jpg">
+</head>
+<body>
+    <div class="card">
+        <h1>Titre du Quizz</h1> 
+    <form id="quiz_form" method="POST" action="creation.php">
+        <div class="input-container">
+            <input placeholder="Titre du Quiz" name="titre" id="titre" class="input-fichier" type="text" required>
+            <label for="titre" class="input-label">Titre du Quiz :</label>
+            <span class="input-aesthetic"></span>
+        </div>
+        <button type="submit" name="action" value="senquizz" id="btn" class="btn">             
+            <img src="/images/send.png" alt="sendquizz" width="40px" height="40px">
+        </button>       
+        </form>
+    </div>
+    <script src="creation.js"></script>
+</body>
+</html>
