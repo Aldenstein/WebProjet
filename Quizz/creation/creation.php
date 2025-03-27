@@ -19,9 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($stmt->execute()) {
             $quiz_id = $conn->insert_id;
-            echo "Le titre du quiz a été inséré avec succès. ID du quiz : " . $quiz_id;
             session_start();
             $_SESSION['quiz_id'] = $quiz_id;
+
+            // Redirection vers questions.php
+            header("Location: questions.php");
+            exit();
         } else {
             echo "Erreur lors de l'insertion : " . $stmt->error;
         }
@@ -34,4 +37,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $conn->close();
 ?>
-

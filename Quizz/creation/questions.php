@@ -45,23 +45,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $conn->close();
 ?>
-
-<!-- Formulaire HTML pour ajouter une question -->
-<form method="POST" action="">
-    <label for="question_text">Question :</label><br>
-    <textarea id="question_text" name="question_text" required></textarea><br><br>
-
-    <label for="option1">Option 1 :</label><br>
-    <input type="text" id="option1" name="option1" required><br><br>
-
-    <label for="option2">Option 2 :</label><br>
-    <input type="text" id="option2" name="option2" required><br><br>
-
-    <label for="option3">Option 3 :</label><br>
-    <input type="text" id="option3" name="option3" required><br><br>
-
-    <label for="correct_option">Option correcte (1, 2 ou 3) :</label><br>
-    <input type="number" id="correct_option" name="correct_option" min="1" max="3" required><br><br>
-
-    <button type="submit">Ajouter la question</button>
-</form>
