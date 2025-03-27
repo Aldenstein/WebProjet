@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <?php
 // Connexion à la base de données
 $servername = "localhost";
@@ -42,3 +43,5 @@ if ($conn->query($sql_quiz) === TRUE) {
 // Fermer la connexion
 $conn->close();
 ?>
+=======
+>>>>>>> Stashed changes

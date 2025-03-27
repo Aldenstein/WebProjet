@@ -1,4 +1,5 @@
-document.getElementById('add-question').addEventListener('click', function() {
+document.getElementById('add-question').addEventListener('click', function(event) {
+    event.preventDefault();
     document.getElementById('question-1').value = '';
     document.getElementById('option-1-1').value = '';
     document.getElementById('option-1-2').value = '';
