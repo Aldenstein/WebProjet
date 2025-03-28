@@ -22,23 +22,35 @@ if ($conn->connect_error) {
 // Vérifier si le formulaire pour ajouter une question a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['question'])) {
     // Si aucun quiz n'est sélectionné, enregistrer le titre automatiquement
-    if (!isset($_SESSION['quiz_id']) && isset($_POST['title']) && !empty(trim($_POST['title']))) {
-        $title = trim($_POST['title']);
-        $stmt = $conn->prepare("INSERT INTO quizzes (title) VALUES (?)");
-        if ($stmt) {
-            $stmt->bind_param("s", $title);
-            if ($stmt->execute()) {
-                $_SESSION['quiz_id'] = $conn->insert_id;
-                echo "<p style='color: green;'>Titre du quiz enregistré automatiquement.</p>";
+    if (!isset($_SESSION['quiz_id'])) {
+        if (isset($_POST['title']) && !empty(trim($_POST['title']))) {
+            $title = trim($_POST['title']);
+            $stmt = $conn->prepare("INSERT INTO quizzes (title) VALUES (?)");
+            if ($stmt) {
+                $stmt->bind_param("s", $title);
+                if ($stmt->execute()) {
+                    $_SESSION['quiz_id'] = $conn->insert_id;
+                    echo "<p style='color: green;'>Quiz créé avec succès : $title</p>";
+                } else {
+                    echo "<p style='color: red;'>Erreur lors de la création du quiz : " . $stmt->error . "</p>";
+                    $stmt->close();
+                    $conn->close();
+                    exit;
+                }
+                $stmt->close();
             } else {
-                echo "<p style='color: red;'>Erreur lors de l'enregistrement du titre : " . $stmt->error . "</p>";
+                echo "<p style='color: red;'>Erreur lors de la préparation de la requête pour le quiz : " . $conn->error . "</p>";
+                $conn->close();
+                exit;
             }
-            $stmt->close();
         } else {
-            echo "<p style='color: red;'>Erreur lors de la préparation de la requête pour le titre : " . $conn->error . "</p>";
+            echo "<p style='color: red;'>Titre du quiz manquant. Veuillez fournir un titre.</p>";
+            $conn->close();
+            exit;
         }
     }
 
+    // Ajouter la question au quiz
     if (isset($_SESSION['quiz_id'])) {
         $quiz_id = $_SESSION['quiz_id'];
         $question = trim($_POST['question']);
@@ -47,7 +59,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['question'])) {
         if (!empty($question) && !empty($question_type)) {
             if ($question_type === "QCM") {
                 if (!isset($_POST['option1'], $_POST['option2'], $_POST['option3'], $_POST['correct_option'])) {
-                    die("Erreur : Les options et la réponse correcte sont obligatoires pour une question QCM.");
+                    echo "<p style='color: red;'>Erreur : Les options et la réponse correcte sont obligatoires pour une question QCM.</p>";
+                    $conn->close();
+                    exit;
                 }
 
                 $option1 = trim($_POST['option1']);
@@ -60,7 +74,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['question'])) {
 
             } elseif ($question_type === "Vrai/Faux") {
                 if (!isset($_POST['correct_option'])) {
-                    die("Erreur : La réponse correcte est obligatoire pour une question Vrai/Faux.");
+                    echo "<p style='color: red;'>Erreur : La réponse correcte est obligatoire pour une question Vrai/Faux.</p>";
+                    $conn->close();
+                    exit;
                 }
 
                 $correct_option = trim($_POST['correct_option']);
@@ -70,7 +86,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['question'])) {
 
             } elseif ($question_type === "Ouverte") {
                 if (!isset($_POST['formatted_answer'])) {
-                    die("Erreur : La réponse préformatée est obligatoire pour une question ouverte.");
+                    echo "<p style='color: red;'>Erreur : La réponse préformatée est obligatoire pour une question ouverte.</p>";
+                    $conn->close();
+                    exit;
                 }
 
                 $formatted_answer = trim($_POST['formatted_answer']);
@@ -79,7 +97,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['question'])) {
                 $stmt->bind_param("isss", $quiz_id, $question, $question_type, $formatted_answer);
 
             } else {
-                die("Erreur : Type de question invalide.");
+                echo "<p style='color: red;'>Erreur : Type de question invalide.</p>";
+                $conn->close();
+                exit;
             }
 
             // Exécuter la requête pour insérer la question
@@ -90,12 +110,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['question'])) {
             }
 
             $stmt->close();
+        } else {
+            echo "<p style='color: red;'>Erreur : La question ou le type de question est manquant.</p>";
         }
-        }
-    } else {
-        echo "<p style='color: red;'>Aucun quiz sélectionné. Veuillez d'abord enregistrer un titre.</p>";
+    }
 }
-
 
 $conn->close();
 ?>
