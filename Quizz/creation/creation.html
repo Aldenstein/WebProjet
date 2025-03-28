@@ -6,16 +6,20 @@
     <title>Ctrl+Quizz</title>
     <link rel="stylesheet" href="creation.css">
     <link rel="icon" href="../images/icone.jpg">
+    <script src="creation.js" defer></script>
 </head>
 <body>
     <div class="card">
         <h1>Créer un Quiz</h1> 
         <form id="quizz-form" action="creation.php" method="POST">
+            <!-- Titre du Quiz -->
             <div class="input-container">
                 <input placeholder="Titre du Quiz" name="title" id="title" class="input-fichier" type="text" required>
                 <label for="title" class="input-label">Titre du Quiz :</label>
                 <span class="input-aesthetic"></span>
             </div>
+
+            <!-- Question -->
             <div id="questions-container">
                 <div class="question">
                     <div class="input-container">
@@ -23,31 +27,60 @@
                         <label for="question" class="input-label">Question :</label>
                         <span class="input-aesthetic"></span>
                     </div>
-                    <div class="options">
+
+                    <!-- Type de Question -->
+                    <div class="input-container">
+                        <label for="question_type" class="input-label">Type de Question :</label>
+                        <select name="question_type" id="question_type" class="input-fichier" required>
+                            <option value="QCM">QCM</option>
+                            <option value="Vrai/Faux">Vrai/Faux</option>
+                            <option value="Ouverte">Ouverte</option>
+                        </select>
+                    </div>
+
+                    <!-- Options pour QCM -->
+                    <div id="qcm-options" style="display: none;">
                         <div class="input-container">
-                            <input placeholder="Option 1" name="option1" id="option1" class="input-fichier" type="text" required>
+                            <input placeholder="Option 1" name="option1" id="option1" class="input-fichier" type="text">
                             <label for="option1" class="input-label">Option 1 :</label>
                         </div>
                         <div class="input-container">
-                            <input placeholder="Option 2" name="option2" id="option2" class="input-fichier" type="text" required>
+                            <input placeholder="Option 2" name="option2" id="option2" class="input-fichier" type="text">
                             <label for="option2" class="input-label">Option 2 :</label>
                         </div>
                         <div class="input-container">
-                            <input placeholder="Option 3" name="option3" id="option3" class="input-fichier" type="text" required>
+                            <input placeholder="Option 3" name="option3" id="option3" class="input-fichier" type="text">
                             <label for="option3" class="input-label">Option 3 :</label>
                         </div>
                         <div class="input-container">
-                            <input placeholder="Option correcte (1, 2 ou 3)" name="correct_option" id="correct_option" class="input-fichier" type="number" min="1" max="3" required>
+                            <input placeholder="Option correcte (1, 2 ou 3)" name="correct_option" id="correct_option" class="input-fichier" type="number" min="1" max="3">
                             <label for="correct_option" class="input-label">Option correcte :</label>
+                        </div>
+                    </div>
+
+                    <!-- Options pour Vrai/Faux -->
+                    <div id="true-false-options" style="display: none;">
+                        <div class="input-container">
+                            <input placeholder="Réponse correcte (Vrai ou Faux)" name="correct_option" id="true_false_correct" class="input-fichier" type="text">
+                            <label for="true_false_correct" class="input-label">Réponse correcte :</label>
+                        </div>
+                    </div>
+
+                    <!-- Réponse pour Question Ouverte -->
+                    <div id="open-answer" style="display: none;">
+                        <div class="input-container">
+                            <textarea placeholder="Réponse préformatée" name="formatted_answer" id="formatted_answer" class="input-fichier"></textarea>
+                            <label for="formatted_answer" class="input-label">Réponse préformatée :</label>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Bouton Ajouter -->
             <button type="submit" class="btn" id="add-question">
-                <img src="../images/save.png" alt="send" width="40px" height="40px">
+                Ajouter la Question
             </button>
         </form>
     </div>
-    <script src="creation.js"></script>
 </body>
 </html>
