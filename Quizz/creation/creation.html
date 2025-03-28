@@ -30,8 +30,9 @@
 
                     <!-- Type de Question -->
                     <div class="input-container">
-                        <label for="question_type" class="input-label">Type de Question :</label>
+                        <label for="question_type" class="input-label" required>Type de Question :</label>
                         <select name="question_type" id="question_type" class="input-fichier" required>
+                            <option value="Choisir Type">Choisir Type</option>
                             <option value="QCM">QCM</option>
                             <option value="Vrai/Faux">Vrai/Faux</option>
                             <option value="Ouverte">Ouverte</option>
@@ -41,19 +42,19 @@
                     <!-- Options pour QCM -->
                     <div id="qcm-options" style="display: none;">
                         <div class="input-container">
-                            <input placeholder="Option 1" name="option1" id="option1" class="input-fichier" type="text">
+                            <input placeholder="Option 1" name="option1" id="option1" class="input-fichier" type="text" required>
                             <label for="option1" class="input-label">Option 1 :</label>
                         </div>
                         <div class="input-container">
-                            <input placeholder="Option 2" name="option2" id="option2" class="input-fichier" type="text">
+                            <input placeholder="Option 2" name="option2" id="option2" class="input-fichier" type="text" required>
                             <label for="option2" class="input-label">Option 2 :</label>
                         </div>
                         <div class="input-container">
-                            <input placeholder="Option 3" name="option3" id="option3" class="input-fichier" type="text">
+                            <input placeholder="Option 3" name="option3" id="option3" class="input-fichier" type="text" required>
                             <label for="option3" class="input-label">Option 3 :</label>
                         </div>
                         <div class="input-container">
-                            <input placeholder="Option correcte (1, 2 ou 3)" name="correct_option" id="correct_option" class="input-fichier" type="number" min="1" max="3">
+                            <input placeholder="Option correcte (1, 2 ou 3)" name="correct_option" id="correct_option" class="input-fichier" type="number" min="1" max="3" required>
                             <label for="correct_option" class="input-label">Option correcte :</label>
                         </div>
                     </div>
@@ -61,7 +62,7 @@
                     <!-- Options pour Vrai/Faux -->
                     <div id="true-false-options" style="display: none;">
                         <div class="input-container">
-                            <input placeholder="Réponse correcte (Vrai ou Faux)" name="correct_option" id="true_false_correct" class="input-fichier" type="text">
+                            <input placeholder="Réponse correcte (Vrai ou Faux)" name="correct_option" id="true_false_correct" class="input-fichier" type="text" required>
                             <label for="true_false_correct" class="input-label">Réponse correcte :</label>
                         </div>
                     </div>
@@ -69,7 +70,7 @@
                     <!-- Réponse pour Question Ouverte -->
                     <div id="open-answer" style="display: none;">
                         <div class="input-container">
-                            <textarea placeholder="Réponse préformatée" name="formatted_answer" id="formatted_answer" class="input-fichier"></textarea>
+                            <textarea placeholder="Réponse préformatée" name="formatted_answer" id="formatted_answer" class="input-fichier" required></textarea>
                             <label for="formatted_answer" class="input-label">Réponse préformatée :</label>
                         </div>
                     </div>
@@ -77,7 +78,7 @@
             </div>
 
             <!-- Bouton Ajouter -->
-            <button type="submit" class="btn" id="add-question">
+            <button type="button" class="btn" id="add-question">
                 Ajouter la Question
             </button>
         </form>

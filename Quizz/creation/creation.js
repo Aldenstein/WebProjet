@@ -19,7 +19,25 @@ function clearFields() {
     document.getElementById("formatted_answer").value = "";
 }
 
-// Ajouter un écouteur d'événement pour vider les champs après soumission
-document.getElementById("quizz-form").addEventListener("submit", function (event) {
-    clearFields();
-});
+// Fonction pour gérer la soumission du formulaire sans rechargement
+function submitQuestion() {
+    const form = document.getElementById("quizz-form");
+    const formData = new FormData(form);
+
+    fetch("creation.php", {
+        method: "POST",
+        body: formData,
+    })
+        .then((response) => response.text())
+        .then((data) => {
+            console.log(data); // Affiche la réponse du serveur dans la console
+            clearFields(); // Vider les champs après la soumission
+            alert("Question ajoutée avec succès !");
+        })
+        .catch((error) => {
+            console.error("Erreur :", error);
+        });
+}
+
+// Ajouter un écouteur d'événement pour le bouton "Ajouter la Question"
+document.getElementById("add-question").addEventListener("click", submitQuestion);
