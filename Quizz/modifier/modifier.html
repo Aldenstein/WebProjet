@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier les quizzes</title>
+    <link rel="stylesheet" href="modifier.css">
+    <script src="modifier.js" defer></script>
+</head>
+<body>
+    <div class="card">
+        <h1>Liste des Quizzes</h1>
+        <div id="quiz-list">
+            <!-- Les quiz seront chargés dynamiquement ici -->
+        </div>
+    </div>
+
+    <div class="card" id="question-editor" style="display: none;">
+        <h1 id="quiz-title">Questions du Quiz</h1>
+        <form id="question-form">
+            <div id="question-list">
+                <!-- Les questions seront chargées dynamiquement ici -->
+            </div>
+            <button type="submit" class="btn">Sauvegarder les modifications</button>
+        </form>
+    </div>
+</body>
+</html>
