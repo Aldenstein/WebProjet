@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['question'])) {
             if ($stmt) {
                 $stmt->bind_param("s", $title);
                 if ($stmt->execute()) {
-                    $_SESSION['quiz_id'] = $conn->insert_id;
+                    $_SESSION['quiz_id'] = $conn->insert_id; // Récupérer l'ID auto-incrémenté
                     echo "<p style='color: green;'>Quiz créé avec succès : $title</p>";
                 } else {
                     echo "<p style='color: red;'>Erreur lors de la création du quiz : " . $stmt->error . "</p>";
