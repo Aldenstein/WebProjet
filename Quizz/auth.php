@@ -43,7 +43,7 @@ if ($action == 'register') {
         $row = $result->fetch_assoc();
         if (password_verify($mdp, $row['mdp'])) {
 if ($row['active'] == 1) {
-                header("Location: creation/creation.html");
+                header("Location: admin/admin.html");
             } else {
             header("Location: liste/liste.html");
 }
