@@ -11,14 +11,18 @@
     <div class="card">
         <h1>Liste des Quizzes</h1>
         <div id="quiz-list">
+            <!-- Les quiz seront chargés dynamiquement ici -->
         </div>
     </div>
 
     <div class="card" id="question-editor" style="display: none;">
         <h1 id="quiz-title">Questions du Quiz</h1>
-        <div id="question-list">
-        </div>
-        <button id="save-changes" class="btn">Sauvegarder les modifications</button>
+        <form id="question-form">
+            <div id="question-list">
+                <!-- Les questions seront chargées dynamiquement ici -->
+            </div>
+            <button type="submit" class="btn">Sauvegarder les modifications</button>
+        </form>
     </div>
 </body>
 </html>
