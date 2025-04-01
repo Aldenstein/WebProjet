@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Activer l'affichage des erreurs pour le débogage
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Connexion à la base de données
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -7,128 +15,127 @@ $dbname = "projetweb";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Erreur de connexion à la base de données : " . $conn->connect_error);
 }
 
-if (!isset($_GET['quiz_id']) || !is_numeric($_GET['quiz_id'])) {
-    die("Erreur : Code PIN du quiz manquant ou invalide.");
+// Initialiser les variables de session si elles n'existent pas
+if (!isset($_SESSION['quiz_id'])) {
+    $_SESSION['quiz_id'] = null;
+}
+if (!isset($_SESSION['current_question'])) {
+    $_SESSION['current_question'] = 0;
+}
+if (!isset($_SESSION['score'])) {
+    $_SESSION['score'] = 0;
+}
+if (!isset($_SESSION['total_questions'])) {
+    $_SESSION['total_questions'] = 0;
 }
 
-$quiz_id = (int)$_GET['quiz_id'];
-
-$sql_quiz = "SELECT title FROM quizzes WHERE quiz_id = ?";
-$stmt_quiz = $conn->prepare($sql_quiz);
-$stmt_quiz->bind_param("i", $quiz_id);
-$stmt_quiz->execute();
-$result_quiz = $stmt_quiz->get_result();
-
-if ($result_quiz->num_rows === 0) {
-    die("Erreur : Quiz non trouvé avec ce code PIN.");
+// Si l'utilisateur soumet un quiz_id pour commencer
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['start_quiz']) && isset($_POST['quiz_id'])) {
+    $quiz_id = intval($_POST['quiz_id']);
+    
+    // Vérifier si le quiz existe
+    $stmt = $conn->prepare("SELECT title FROM quizzes WHERE quiz_id = ?");
+    $stmt->bind_param("i", $quiz_id);
+    $stmt->execute();
+    $stmt->store_result();
+    
+    if ($stmt->num_rows > 0) {
+        $_SESSION['quiz_id'] = $quiz_id;
+        $_SESSION['current_question'] = 0;
+        $_SESSION['score'] = 0;
+        
+        // Compter le nombre total de questions
+        $stmt_count = $conn->prepare("SELECT COUNT(*) FROM questions WHERE quiz_id = ?");
+        $stmt_count->bind_param("i", $quiz_id);
+        $stmt_count->execute();
+        $stmt_count->bind_result($total_questions);
+        $stmt_count->fetch();
+        $_SESSION['total_questions'] = $total_questions;
+        $stmt_count->close();
+    } else {
+        echo "<p style='color: red;'>Quiz non trouvé avec l'ID $quiz_id.</p>";
+    }
+    $stmt->close();
 }
 
-$quiz = $result_quiz->fetch_assoc();
-$quiz_title = $quiz['title'];
+// Si l'utilisateur soumet une réponse
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_answer']) && $_SESSION['quiz_id']) {
+    $user_answer = intval($_POST['answer']);
+    $current_question_id = intval($_POST['question_id']);
+    
+    // Vérifier la bonne réponse
+    $stmt = $conn->prepare("SELECT qcm_rep FROM questions WHERE question_id = ? AND quiz_id = ?");
+    $stmt->bind_param("ii", $current_question_id, $_SESSION['quiz_id']);
+    $stmt->execute();
+    $stmt->bind_result($correct_answer);
+    $stmt->fetch();
+    
+    if ($user_answer === $correct_answer) {
+        echo "<p style='color: green;'>Bonne réponse !</p>";
+        $_SESSION['score']++;
+    } else {
+        echo "<p style='color: red;'>Mauvaise réponse. La bonne réponse était l'option $correct_answer.</p>";
+    }
+    $_SESSION['current_question']++;
+    $stmt->close();
+}
 
-$sql_questions = "SELECT * FROM questions WHERE quiz_id = ?";
-$stmt_questions = $conn->prepare($sql_questions);
-$stmt_questions->bind_param("i", $quiz_id);
-$stmt_questions->execute();
-$result_questions = $stmt_questions->get_result();
-$score = 0;
-$total_questions = $result_questions->num_rows;
-$submitted = isset($_POST['submit']);
-
-if ($submitted) {
-    $result_questions->data_seek(0);
-
-    while ($question = $result_questions->fetch_assoc()) {
-        $question_id = $question['question_id'];
-        $correct_option = $question['correct_option'];
-        if (isset($_POST['answer'][$question_id])) {
-            $user_answer = $_POST['answer'][$question_id];
-            if ($user_answer === $correct_option) {
-                $score++;
-            }
+// Afficher la question actuelle ou le résultat final
+if ($_SESSION['quiz_id']) {
+    $quiz_id = $_SESSION['quiz_id'];
+    $current_question = $_SESSION['current_question'];
+    
+    if ($current_question < $_SESSION['total_questions']) {
+        // Récupérer toutes les questions pour ce quiz
+        $stmt = $conn->prepare("SELECT question_id, question, option1, option2, option3 FROM questions WHERE quiz_id = ? ORDER BY question_id LIMIT 1 OFFSET ?");
+        $stmt->bind_param("ii", $quiz_id, $current_question);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($row = $result->fetch_assoc()) {
+            $question_id = $row['question_id'];
+            $question = $row['question'];
+            $option1 = $row['option1'];
+            $option2 = $row['option2'];
+            $option3 = $row['option3'];
+            
+            // Afficher la question
+            echo "<h3>Question " . ($current_question + 1) . " / " . $_SESSION['total_questions'] . "</h3>";
+            echo "<p>" . htmlspecialchars($question) . "</p>";
+            echo "<form method='post'>";
+            echo "<input type='hidden' name='question_id' value='$question_id'>";
+            echo "<label><input type='radio' name='answer' value='1' required> " . htmlspecialchars($option1) . "</label><br>";
+            echo "<label><input type='radio' name='answer' value='2'> " . htmlspecialchars($option2) . "</label><br>";
+            echo "<label><input type='radio' name='answer' value='3'> " . htmlspecialchars($option3) . "</label><br>";
+            echo "<input type='submit' name='submit_answer' value='Valider'>";
+            echo "</form>";
+        }
+        $stmt->close();
+    } else {
+        // Quiz terminé
+        echo "<h3>Quiz terminé !</h3>";
+        echo "<p>Votre score : " . $_SESSION['score'] . " / " . $_SESSION['total_questions'] . "</p>";
+        echo "<form method='post'><input type='submit' name='reset' value='Recommencer un autre quiz'></form>";
+        
+        // Réinitialiser la session si demandé
+        if (isset($_POST['reset'])) {
+            session_unset();
+            session_destroy();
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
         }
     }
+} else {
+    // Afficher le formulaire pour choisir un quiz
+    echo "<h3>Choisir un quiz</h3>";
+    echo "<form method='post'>";
+    echo "<label>Entrez l'ID du quiz : <input type='number' name='quiz_id' required></label>";
+    echo "<input type='submit' name='start_quiz' value='Commencer le quiz'>";
+    echo "</form>";
 }
-?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ctrl+Quizz - <?php echo htmlspecialchars($quiz_title); ?></title>
-    <link rel="stylesheet" href="liste.css">
-    <script src="script.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="icon" href="../images/icone.jpg">
-</head>
-<body>
-    <div class="navbar">
-        <button type="submit" name="accueil" value="accueil" id="homebtn" class="btn">    
-            <a href="../index.html">        
-                <img src="../images/home.jpg" alt="send" width="40px" height="40px">
-            </a> 
-        </button>
-        <h1 align="center">Bienvenue sur Ctrl+Quizz</h1>
-        <button type="submit" name="deconnexion" value="deco" id="decobtn" class="btn">
-            <a href="../deco/deco.html">            
-                <img src="../images/deco.jpg" alt="send" width="40px" height="40px">
-            </a>
-        </button>
-    </div>
-    <div class="card">
-        <h1>Quiz : <?php echo htmlspecialchars($quiz_title); ?></h1>
-
-        <?php if ($submitted): ?>
-            <h2>Résultat</h2>
-            <p>Votre score : <?php echo $score; ?> / <?php echo $total_questions; ?></p>
-            <p>Pourcentage : <?php echo ($total_questions > 0) ? round(($score / $total_questions) * 100, 2) : 0; ?>%</p>
-            <a href="liste.html">Rejoindre un autre quiz</a>
-        <?php else: ?>
-            <?php if ($result_questions->num_rows > 0): ?>
-                <form method="POST" action="">
-                    <?php
-                    $question_number = 1;
-                    while ($question = $result_questions->fetch_assoc()):
-                        $question_id = $question['question_id'];
-                    ?>
-                        <h3>Question <?php echo $question_number; ?> : <?php echo htmlspecialchars($question['question']); ?></h3>
-                        <div class="input-container">
-                            <label>
-                                <input type="radio" name="answer[<?php echo $question_id; ?>]" value="1" required>
-                                <?php echo htmlspecialchars($question['option1']); ?>
-                            </label><br>
-                            <label>
-                                <input type="radio" name="answer[<?php echo $question_id; ?>]" value="2">
-                                <?php echo htmlspecialchars($question['option2']); ?>
-                            </label><br>
-                            <label>
-                                <input type="radio" name="answer[<?php echo $question_id; ?>]" value="3">
-                                <?php echo htmlspecialchars($question['option3']); ?>
-                            </label><br>
-                        </div>
-                    <?php
-                        $question_number++;
-                    endwhile;
-                    ?>
-                    <button type="submit" name="submit" id="btn" class="btn">Soumettre mes réponses</button>
-                </form>
-            <?php else: ?>
-                <p>Aucune question trouvée pour ce quiz.</p>
-                <a href="liste.html">Rejoindre un autre quiz</a>
-            <?php endif; ?>
-        <?php endif; ?>
-    </div>
-</body>
-</html>
-
-<?php
-$stmt_quiz->close();
-$stmt_questions->close();
 $conn->close();
 ?>
