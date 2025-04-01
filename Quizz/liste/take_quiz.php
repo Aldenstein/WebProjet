@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -42,14 +44,43 @@ if ($submitted) {
     $result_questions->data_seek(0);
 
     while ($question = $result_questions->fetch_assoc()) {
-        $question_id = $question['question_id'];
-        $correct_option = $question['correct_option'];
-        if (isset($_POST['answer'][$question_id])) {
-            $user_answer = $_POST['answer'][$question_id];
-            if ($user_answer === $correct_option) {
-                $score++;
+        $question_id = $question['id'];
+        $question_type = $question['question_type'];
+
+        if ($question_type === "QCM") {
+            $correct_option = $question['qcm_rep'];
+            if (isset($_POST['answer'][$question_id])) {
+                $user_answer = intval($_POST['answer'][$question_id]);
+                if ($user_answer === $correct_option) {
+                    $score++;
+                }
+            }
+        } elseif ($question_type === "Vrai/Faux") {
+            $correct_option = intval($question['qcm_rep']); // 1 pour Vrai, 0 pour Faux
+            if (isset($_POST['answer'][$question_id])) {
+                $user_answer = intval($_POST['answer'][$question_id]);
+                if ($user_answer === $correct_option) {
+                    $score++;
+                }
+            }
+        } elseif ($question_type === "Ouverte") {
+            $correct_answer = strtolower(trim($question['formatted_answer']));
+            if (isset($_POST['answer'][$question_id])) {
+                $user_answer = strtolower(trim($_POST['answer'][$question_id]));
+                if ($user_answer === $correct_answer) {
+                    $score++;
+                }
             }
         }
+    }
+
+    // Ajouter le score à l'utilisateur connecté
+    if (isset($_SESSION['user_id'])) {
+        $user_id = $_SESSION['user_id'];
+        $stmt_score = $conn->prepare("UPDATE users SET score = score + ? WHERE id = ?");
+        $stmt_score->bind_param("ii", $score, $user_id);
+        $stmt_score->execute();
+        $stmt_score->close();
     }
 }
 ?>
@@ -61,11 +92,6 @@ if ($submitted) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ctrl+Quizz - <?php echo htmlspecialchars($quiz_title); ?></title>
     <link rel="stylesheet" href="liste.css">
-    <script src="script.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="icon" href="../images/icone.jpg">
 </head>
 <body>
     <div class="navbar">
@@ -95,22 +121,38 @@ if ($submitted) {
                     <?php
                     $question_number = 1;
                     while ($question = $result_questions->fetch_assoc()):
-                        $question_id = $question['question_id'];
+                        $question_id = $question['id'];
+                        $question_type = $question['question_type'];
                     ?>
                         <h3>Question <?php echo $question_number; ?> : <?php echo htmlspecialchars($question['question']); ?></h3>
                         <div class="input-container">
-                            <label>
-                                <input type="radio" name="answer[<?php echo $question_id; ?>]" value="1" required>
-                                <?php echo htmlspecialchars($question['option1']); ?>
-                            </label><br>
-                            <label>
-                                <input type="radio" name="answer[<?php echo $question_id; ?>]" value="2">
-                                <?php echo htmlspecialchars($question['option2']); ?>
-                            </label><br>
-                            <label>
-                                <input type="radio" name="answer[<?php echo $question_id; ?>]" value="3">
-                                <?php echo htmlspecialchars($question['option3']); ?>
-                            </label><br>
+                            <?php if ($question_type === "QCM"): ?>
+                                <label>
+                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="1" required>
+                                    <?php echo htmlspecialchars($question['option1']); ?>
+                                </label><br>
+                                <label>
+                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="2">
+                                    <?php echo htmlspecialchars($question['option2']); ?>
+                                </label><br>
+                                <label>
+                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="3">
+                                    <?php echo htmlspecialchars($question['option3']); ?>
+                                </label><br>
+                            <?php elseif ($question_type === "Vrai/Faux"): ?>
+                                <label>
+                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="1" required>
+                                    Vrai
+                                </label><br>
+                                <label>
+                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="0">
+                                    Faux
+                                </label><br>
+                            <?php elseif ($question_type === "Ouverte"): ?>
+                                <label>
+                                    <input type="text" name="answer[<?php echo $question_id; ?>]" placeholder="Votre réponse" required>
+                                </label><br>
+                            <?php endif; ?>
                         </div>
                     <?php
                         $question_number++;
