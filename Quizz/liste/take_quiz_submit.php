@@ -85,8 +85,9 @@ $stmt_score->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>resultats quiz</title>
-    <link rel="stylesheet" href="take_quiz.css"> <!-- Appliquer le style -->
+    <title>Ctrl+Quizz - Résultats</title>
+    <link rel="stylesheet" href="take_quiz.css"> 
+    <link rel="icon" href="../images/icone.jpg">
 </head>
 <body>
     <div class="card">
