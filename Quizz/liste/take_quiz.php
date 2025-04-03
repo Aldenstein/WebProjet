@@ -18,7 +18,7 @@ if (!isset($_GET['quiz_id']) || !is_numeric($_GET['quiz_id'])) {
 
 $quiz_id = (int)$_GET['quiz_id'];
 
-$sql_quiz = "SELECT title FROM quizzes WHERE quiz_id = ?";
+$sql_quiz = "SELECT title FROM quizzes WHERE id = ?";
 $stmt_quiz = $conn->prepare($sql_quiz);
 $stmt_quiz->bind_param("i", $quiz_id);
 $stmt_quiz->execute();
@@ -36,53 +36,10 @@ $stmt_questions = $conn->prepare($sql_questions);
 $stmt_questions->bind_param("i", $quiz_id);
 $stmt_questions->execute();
 $result_questions = $stmt_questions->get_result();
-$score = 0;
-$total_questions = $result_questions->num_rows;
-$submitted = isset($_POST['submit']);
 
-if ($submitted) {
-    $result_questions->data_seek(0);
-
-    while ($question = $result_questions->fetch_assoc()) {
-        $question_id = $question['id'];
-        $question_type = $question['question_type'];
-
-        if ($question_type === "QCM") {
-            $correct_option = $question['qcm_rep'];
-            if (isset($_POST['answer'][$question_id])) {
-                $user_answer = intval($_POST['answer'][$question_id]);
-                if ($user_answer === $correct_option) {
-                    $score++;
-                }
-            }
-        } elseif ($question_type === "Vrai/Faux") {
-            $correct_option = intval($question['qcm_rep']);
-            if (isset($_POST['answer'][$question_id])) {
-                $user_answer = intval($_POST['answer'][$question_id]);
-                if ($user_answer === $correct_option) {
-                    $score++;
-                }
-            }
-        } elseif ($question_type === "Ouverte") {
-            $correct_answer = strtolower(trim($question['formatted_answer']));
-            if (isset($_POST['answer'][$question_id])) {
-                $user_answer = strtolower(trim($_POST['answer'][$question_id]));
-                if ($user_answer === $correct_answer) {
-                    $score++;
-                }
-            }
-        }
-    }
-
-    // Ajouter le score à l'utilisateur connecté
-    if (isset($_SESSION['user_id'])) {
-        $user_id = $_SESSION['user_id'];
-        $stmt_score = $conn->prepare("UPDATE users SET score = score + ? WHERE id = ?");
-        $stmt_score->bind_param("ii", $score, $user_id);
-        $stmt_score->execute();
-        $stmt_score->close();
-    }
-}
+$stmt_quiz->close();
+$stmt_questions->close();
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -91,40 +48,60 @@ if ($submitted) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ctrl+Quizz - <?php echo htmlspecialchars($quiz_title); ?></title>
-    <link rel="stylesheet" href="liste.css">
+    <link rel="stylesheet" href="take_quiz.css">
+    <script>
+        let timePerQuestion = 5; // Temps en secondes par question
+        let totalQuestions = <?php echo $result_questions->num_rows; ?>;
+        let timeLeft = totalQuestions * timePerQuestion; // Temps total
+        let timer;
+
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+
+            timer = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('quiz-form').submit(); // Soumettre automatiquement le formulaire
+                } else {
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerElement.textContent = `Temps restant : ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
+        window.onload = startTimer;
+    </script>
 </head>
 <body>
     <div class="navbar">
-        <button type="submit" name="accueil" value="accueil" id="homebtn" class="btn">    
-            <a href="../index.html">        
-                <img src="../images/home.jpg" alt="send" width="40px" height="40px">
-            </a> 
+        <div id="timer" style="font-size: 20px; color: red; position: absolute; top: 10px; left: 10px;">Temps restant : 00:00</div>
+        <button id="homebtn" class="btn">
+            <a href="../index.html">
+                <img src="../images/home.jpg" alt="Accueil" width="40px" height="40px">
+            </a>
         </button>
         <h1 align="center">Bienvenue sur Ctrl+Quizz</h1>
-        <button type="submit" name="deconnexion" value="deco" id="decobtn" class="btn">
-            <a href="../deco/deco.html">            
-                <img src="../images/deco.jpg" alt="send" width="40px" height="40px">
+        <button id="decobtn" class="btn">
+            <a href="../deco/deco.html">
+                <img src="../images/deco.jpg" alt="Déconnexion" width="40px" height="40px">
             </a>
         </button>
     </div>
     <div class="card">
         <h1>Quiz : <?php echo htmlspecialchars($quiz_title); ?></h1>
 
-        <?php if ($submitted): ?>
-            <h2>Résultat</h2>
-            <p>Votre score : <?php echo $score; ?> / <?php echo $total_questions; ?></p>
-            <p>Pourcentage : <?php echo ($total_questions > 0) ? round(($score / $total_questions) * 100, 2) : 0; ?>%</p>
-            <a href="liste.html">Rejoindre un autre quiz</a>
-        <?php else: ?>
-            <?php if ($result_questions->num_rows > 0): ?>
-                <form method="POST" action="">
-                    <?php
-                    $question_number = 1;
-                    while ($question = $result_questions->fetch_assoc()):
-                        $question_id = $question['id'];
-                        $question_type = $question['question_type'];
-                    ?>
-                        <h3>Question <?php echo $question_number; ?> : <?php echo htmlspecialchars($question['question']); ?></h3>
+        <?php if ($result_questions->num_rows > 0): ?>
+            <form id="quiz-form" method="POST" action="take_quiz_submit.php?quiz_id=<?php echo $quiz_id; ?>">
+                <?php
+                $question_number = 1;
+                while ($question = $result_questions->fetch_assoc()):
+                    $question_id = $question['id'];
+                    $question_type = $question['question_type'];
+                ?>
+                    <div class="question">
+                        <h3>Question <?php echo $question_number; ?> : <?php echo htmlspecialchars($question['question_text']); ?></h3>
                         <div class="input-container">
                             <?php if ($question_type === "QCM"): ?>
                                 <label>
@@ -154,23 +131,17 @@ if ($submitted) {
                                 </label><br>
                             <?php endif; ?>
                         </div>
-                    <?php
-                        $question_number++;
-                    endwhile;
-                    ?>
-                    <button type="submit" name="submit" id="btn" class="btn">Soumettre mes réponses</button>
-                </form>
-            <?php else: ?>
-                <p>Aucune question trouvée pour ce quiz.</p>
-                <a href="liste.html">Rejoindre un autre quiz</a>
-            <?php endif; ?>
+                    </div>
+                <?php
+                    $question_number++;
+                endwhile;
+                ?>
+                <button type="submit" id="btn" class="btn">Soumettre mes réponses</button>
+            </form>
+        <?php else: ?>
+            <p>Aucune question trouvée pour ce quiz.</p>
+            <a href="liste.html">Rejoindre un autre quiz</a>
         <?php endif; ?>
     </div>
 </body>
 </html>
-
-<?php
-$stmt_quiz->close();
-$stmt_questions->close();
-$conn->close();
-?>

@@ -1,4 +1,6 @@
 <?php
+session_start(); // Démarrer la session
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -42,11 +44,14 @@ if ($action == 'register') {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($mdp, $row['mdp'])) {
-if ($row['active'] == 1) {
+            // Stocker l'ID de l'utilisateur dans la session
+            $_SESSION['user_id'] = $row['id'];
+
+            if ($row['active'] == 1) {
                 header("Location: admin/admin.html");
             } else {
-            header("Location: liste/liste.html");
-}
+                header("Location: liste/liste.html");
+            }
             exit();
         } else {
             header("Location: invalide/invalide.html");

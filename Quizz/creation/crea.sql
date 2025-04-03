@@ -15,4 +15,6 @@ CREATE TABLE questions (
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
 );
 
+ALTER TABLE `users` CHANGE `score` `score` INT(11) NULL DEFAULT '0';
+
 ALTER TABLE `users` ADD `score` INT NULL DEFAULT NULL AFTER `active`;

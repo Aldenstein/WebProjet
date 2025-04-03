@@ -15,13 +15,13 @@ if ($conn->connect_error) {
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 if ($action === 'getQuizzes') {
-    $result = $conn->query("SELECT quiz_id, title FROM quizzes");
+    $result = $conn->query("SELECT id, title FROM quizzes");
     if ($result) {
         if ($result->num_rows > 0) {
             while ($quiz = $result->fetch_assoc()) {
                 echo '<div class="quiz-item">';
-                echo '<span class="quiz-title" data-id="' . $quiz['quiz_id'] . '">' . htmlspecialchars($quiz['title']) . '</span>';
-                echo '<button onclick="deleteQuiz(' . $quiz['quiz_id'] . ')">Supprimer</button>';
+                echo '<span class="quiz-title" data-id="' . $quiz['id'] . '">' . htmlspecialchars($quiz['title']) . '</span>';
+                echo '<button onclick="deleteQuiz(' . $quiz['id'] . ')">Supprimer</button>';
                 echo '</div>';
             }
         } else {
@@ -32,11 +32,22 @@ if ($action === 'getQuizzes') {
     }
 } elseif ($action === 'deleteQuiz') {
     $id = intval($_GET['id']);
-    $conn->query("DELETE FROM quizzes WHERE quiz_id = $id");
+    $stmt = $conn->prepare("DELETE FROM quizzes WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        echo "Quiz supprimé avec succès.";
+    } else {
+        echo "Erreur lors de la suppression du quiz : " . $stmt->error;
+    }
+    $stmt->close();
 } elseif ($action === 'getQuestions') {
     $quizId = intval($_GET['quizId']);
-    $result = $conn->query("SELECT id, question, question_type, option1, option2, option3, correct_option, formatted_answer FROM questions WHERE quiz_id = $quizId");
-    if ($result) {
+    $stmt = $conn->prepare("SELECT id, question, question_type, option1, option2, option3, correct_option, formatted_answer FROM questions WHERE quiz_id = ?");
+    $stmt->bind_param("i", $quizId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
         while ($question = $result->fetch_assoc()) {
             echo '<div class="question-item">';
             echo '<input type="text" value="' . htmlspecialchars($question['question']) . '" data-id="' . $question['id'] . '" class="question-text" />';
@@ -56,9 +67,17 @@ if ($action === 'getQuizzes') {
     } else {
         echo '<p>Aucune question trouvée pour ce quiz.</p>';
     }
+    $stmt->close();
 } elseif ($action === 'deleteQuestion') {
     $id = intval($_GET['id']);
-    $conn->query("DELETE FROM questions WHERE id = $id");
+    $stmt = $conn->prepare("DELETE FROM questions WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        echo "Question supprimée avec succès.";
+    } else {
+        echo "Erreur lors de la suppression de la question : " . $stmt->error;
+    }
+    $stmt->close();
 } elseif ($action === 'saveQuestions') {
     $questions = json_decode(file_get_contents("php://input"), true);
     foreach ($questions as $question) {
@@ -71,11 +90,18 @@ if ($action === 'getQuizzes') {
             $option2 = $conn->real_escape_string($question['option2']);
             $option3 = $conn->real_escape_string($question['option3']);
             $correct_option = $conn->real_escape_string($question['correct_option']);
-            $conn->query("UPDATE questions SET question = '$text', option1 = '$option1', option2 = '$option2', option3 = '$option3', correct_option = '$correct_option' WHERE id = $id");
+            $stmt = $conn->prepare("UPDATE questions SET question = ?, option1 = ?, option2 = ?, option3 = ?, correct_option = ? WHERE id = ?");
+            $stmt->bind_param("sssssi", $text, $option1, $option2, $option3, $correct_option, $id);
         } elseif ($type === 'Ouverte') {
             $formatted_answer = $conn->real_escape_string($question['formatted_answer']);
-            $conn->query("UPDATE questions SET question = '$text', formatted_answer = '$formatted_answer' WHERE id = $id");
+            $stmt = $conn->prepare("UPDATE questions SET question = ?, formatted_answer = ? WHERE id = ?");
+            $stmt->bind_param("ssi", $text, $formatted_answer, $id);
         }
+
+        if (!$stmt->execute()) {
+            echo "Erreur lors de la mise à jour de la question ID $id : " . $stmt->error;
+        }
+        $stmt->close();
     }
 }
 

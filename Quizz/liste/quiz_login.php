@@ -14,9 +14,15 @@ session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $pin = $_POST['pin'];
 
-    $sql = "SELECT id FROM quizzes WHERE quizz_id = ?";
+    // Correction de la requête SQL : utilisation de la colonne `id` au lieu de `quizz_id`
+    $sql = "SELECT id FROM quizzes WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $pin);
+
+    if (!$stmt) {
+        die("Erreur lors de la préparation de la requête : " . $conn->error);
+    }
+
+    $stmt->bind_param("i", $pin); // Assurez-vous que $pin est un entier
     $stmt->execute();
     $stmt->store_result();
 
@@ -26,10 +32,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $_SESSION['quiz_id'] = $quiz_id;
 
-        header("Location: quiz.php");
+        // Redirection vers la page du quiz
+        header("Location: take_quiz.php?quiz_id=" . $quiz_id);
         exit();
     } else {
         echo "Code PIN invalide.";
     }
+
+    $stmt->close();
 }
+$conn->close();
 ?>
