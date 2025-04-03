@@ -86,7 +86,7 @@ $conn->close();
 <body>
 	<div class="navbar">
         <button name="timer" value="timer" id="homebtn" class="btn">    
-            <a href="../index.html">        
+            <a href="../liste/liste.html">        
                 <img src="../images/home.jpg" alt="send" width="40px" height="40px">
             </a> 
         </button>
