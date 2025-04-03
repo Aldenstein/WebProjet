@@ -84,20 +84,20 @@ $conn->close();
     </script>
 </head>
 <body>
-    <div class="navbar">
-        <div id="timer" style="font-size: 20px; color: red; position: absolute; top: 10px; left: 10px;">Temps restant : 00:00</div>
-        <button id="homebtn" class="btn">
-            <a href="../index.html">
-                <img src="../images/home.jpg" alt="Accueil" width="40px" height="40px">
-            </a>
+	<div class="navbar">
+        <button name="timer" value="timer" id="homebtn" class="btn">    
+            <a href="../index.html">        
+                <img src="../images/home.jpg" alt="send" width="40px" height="40px">
+            </a> 
         </button>
-        <h1 align="center">Bienvenue sur Ctrl+Quizz</h1>
-        <button id="decobtn" class="btn">
-            <a href="../deco/deco.html">
-                <img src="../images/deco.jpg" alt="Déconnexion" width="40px" height="40px">
+        <h1 align="center">Bienvenue sur Ctrl+Quizz !</h1>
+        <button type="submit" name="deconnexion" value="deco" id="decobtn" class="btn">
+            <a href="../deco/deco.html">            
+                <img src="../images/deco.jpg" alt="send" width="40px" height="40px">
             </a>
         </button>
     </div>
+    <div id="timer"></div>
     <div class="card">
         <h1>Quiz : <?php echo htmlspecialchars($quiz_title); ?></h1>
 
@@ -145,11 +145,17 @@ $conn->close();
                     $question_number++;
                 endwhile;
                 ?>
-                <button type="submit" id="btn" class="btn">Soumettre mes réponses</button>
+                <button type="submit" name="action" value="register" id="btn" class="btn">             
+                    <img src="../images/save.png" alt="adduser" width="40px" height="40px">
+                </button>
             </form>
         <?php else: ?>
             <p>Aucune question trouvée pour ce quiz.</p>
-            <a href="liste.html">Rejoindre un autre quiz</a>
+            <button id="btnautrequiz" class="btn">
+            <a href="../liste/liste.html">
+                <img src="../images/plus.jpg" alt="Rejoindre un autre quizz" width="40px" height="40px">
+            </a>
+        </button>
         <?php endif; ?>
     </div>
 </body>

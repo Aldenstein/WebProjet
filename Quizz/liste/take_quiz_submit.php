@@ -86,15 +86,19 @@ $stmt_score->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ctrl+Quizz - Résultats</title>
-    <link rel="stylesheet" href="take_quiz.css"> 
+    <link rel="stylesheet" href="take_quiz_submit.css"> 
     <link rel="icon" href="../images/icone.jpg">
 </head>
 <body>
     <div class="card">
-        <h1>resultats quiz</h1>
-        <p>quiz id : <?php echo htmlspecialchars($quiz_id); ?></p>
-        <p>score : <?php echo htmlspecialchars($score); ?> / <?php echo htmlspecialchars($total_questions); ?></p>
-        <a href="liste.html" class="btn">rejoindre un autre quiz</a>
+        <h1>Resultats de votre Quizz</h1>
+        <p>Quiz id : <?php echo htmlspecialchars($quiz_id); ?></p>
+        <p>Score : <?php echo htmlspecialchars($score); ?> / <?php echo htmlspecialchars($total_questions); ?></p>
+        <button id="btnautrequiz" class="btn">
+            <a href="../liste/liste.html">
+                <img src="../images/pin.jpg" alt="Rejoindre un autre quizz" width="40px" height="40px">
+            </a>
+        </button>
     </div>
 </body>
 </html>

@@ -1,70 +1,117 @@
-body {
-    font-family: 'Open Sans', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f9;
+* {
+    font-family: "Open Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings:
+      "wdth" 100;
 }
-
-.navbar {
-    display: flex;
-    justify-content: space-between;
+body{
+    background-color: #e6e6fa;
+    justify-content: center;
     align-items: center;
-    background-color: #333;
-    color: white;
-    padding: 10px 20px;
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
 }
-
-.navbar h1 {
-    margin: 0;
-    font-size: 24px;
-}
-
-.navbar .btn img {
-    vertical-align: middle;
-}
-
-.card {
-    max-width: 800px;
+.card{
+	max-width: 800px;
     margin: 20px auto;
     background: white;
-    border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 20px;
+    background-color: #f0f8ff;
+    border-radius: 10px;
+    text-align: center;
 }
 
-.card h1, .card h2 {
-    text-align: center;
-    color: #333;
-}
-
-.card p {
-    text-align: center;
-    font-size: 18px;
+.card h1{
+    font-size: 2rem;
 }
 
 .input-container {
-    margin: 10px 0;
-}
-
-.input-container label {
-    display: block;
-    margin: 5px 0;
-}
-
-.btn {
+    position: relative;
+    margin-top: 50px;
+    width: 80%;
+    left: 20px;
+  }
+  
+  .input-fichier {
     display: block;
     width: 100%;
     padding: 10px;
-    background-color: #007BFF;
-    color: white;
+    font-size: 16px;
     border: none;
-    border-radius: 4px;
+    border-bottom: 2px solid #ccc;
+    outline: none;
+    background-color: transparent;
+  }
+  
+  .input-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 16px;
+    color: rgba(204, 204, 204, 0);
+    pointer-events: none;
+    transition: all 0.3s ease;
+  }
+  
+  .input-aesthetic {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background-color: #184766;
+    transition: all 0.3s ease;
+  }
+  
+
+  .input-fichier:focus + .input-label {
+    top: -20px;
+    font-size: 12px;
+    color: #184766;
+  }
+  
+  .input-fichier:focus + .input-label + .input-aesthetic {
+    width: 110%;
+  }
+  .btn{
+    background-color:transparent;
+    border: none;
+    padding: 10px;
+    border-radius: 500px;
+    margin-top: 1.5em;
+    font-size: 1em;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .btn img{
+    display: inline-block;
+    justify-content: center;
+    align-items: center;
+  }
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 98%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: transparent;
+}
+.navbar button {
+    background: none;
+    border: none;
+    color: black;
     font-size: 16px;
     cursor: pointer;
-    text-align: center;
-    text-decoration: none;
 }
-
-.btn:hover {
-    background-color: #0056b3;
+.navbar h1 {
+    margin: 0;
+    font-size: 2rem;
 }
