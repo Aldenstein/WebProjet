@@ -1,6 +1,8 @@
 <?php
+// demarre session
 session_start();
 
+// connexion a la bdd
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -8,29 +10,34 @@ $dbname = "projetweb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+// verifier connexion
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("erreur connexion : " . $conn->connect_error);
 }
 
+// verifier si quiz_id present
 if (!isset($_GET['quiz_id']) || !is_numeric($_GET['quiz_id'])) {
-    die("Erreur : Code PIN du quiz manquant ou invalide.");
+    die("quiz id manquant ou invalide");
 }
 
 $quiz_id = (int)$_GET['quiz_id'];
 
+// recup titre du quiz
 $sql_quiz = "SELECT title FROM quizzes WHERE id = ?";
 $stmt_quiz = $conn->prepare($sql_quiz);
 $stmt_quiz->bind_param("i", $quiz_id);
 $stmt_quiz->execute();
 $result_quiz = $stmt_quiz->get_result();
 
+// verifier si quiz existe
 if ($result_quiz->num_rows === 0) {
-    die("Erreur : Quiz non trouvé avec ce code PIN.");
+    die("quiz non trouvé");
 }
 
 $quiz = $result_quiz->fetch_assoc();
 $quiz_title = $quiz['title'];
 
+// recup questions du quiz
 $sql_questions = "SELECT * FROM questions WHERE quiz_id = ?";
 $stmt_questions = $conn->prepare($sql_questions);
 $stmt_questions->bind_param("i", $quiz_id);
@@ -50,18 +57,20 @@ $conn->close();
     <title>Ctrl+Quizz - <?php echo htmlspecialchars($quiz_title); ?></title>
     <link rel="stylesheet" href="take_quiz.css">
     <script>
-        let timePerQuestion = 5; // Temps en secondes par question
+        // timer pour le quiz
+        let timePerQuestion = 8; // secondes par question
         let totalQuestions = <?php echo $result_questions->num_rows; ?>;
-        let timeLeft = totalQuestions * timePerQuestion; // Temps total
+        let timeLeft = totalQuestions * timePerQuestion; // temps total
         let timer;
 
+        // demarre le timer
         function startTimer() {
             const timerElement = document.getElementById('timer');
 
             timer = setInterval(() => {
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('quiz-form').submit(); // Soumettre automatiquement le formulaire
+                    document.getElementById('quiz-form').submit(); // soumet auto
                 } else {
                     const minutes = Math.floor(timeLeft / 60);
                     const seconds = timeLeft % 60;

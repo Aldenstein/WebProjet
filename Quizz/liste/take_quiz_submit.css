@@ -1,0 +1,70 @@
+/* fichier : take_quiz_submit.css */
+
+/* appliquer une police et un style global */
+* {
+    font-family: "Open Sans", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #e6e6fa; /* couleur de fond douce */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.card {
+    background-color: #f0f8ff; /* couleur de fond de la carte */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* ombre douce */
+    width: 400px;
+    padding: 20px;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out; /* animation d'apparition */
+}
+
+.card h1 {
+    font-size: 2rem;
+    color: #184766; /* couleur principale */
+    margin-bottom: 20px;
+}
+
+.card p {
+    font-size: 1.2rem;
+    color: #333; /* couleur du texte */
+    margin: 10px 0;
+}
+
+.btn {
+    display: inline-block;
+    background-color: #184766; /* couleur principale */
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0f3449; /* couleur au survol */
+}
+
+/* animation d'apparition */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
