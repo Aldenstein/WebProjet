@@ -48,13 +48,13 @@ if ($action === 'getQuizzes') {
         if ($stmt) {
             $stmt->bind_param("i", $id);
             if ($stmt->execute()) {
-                echo "Quiz supprimé avec succès.";
+                echo "<script>alert('Quiz supprimé avec succès.'); window.location.href='modifier.html';</script>";
             } else {
-                echo "Erreur lors de la suppression du quiz.";
+                echo "<script>alert('Erreur lors de la suppression du quiz.'); window.location.href='modifier.html';</script>";
             }
             $stmt->close();
         } else {
-            echo "Erreur lors de la préparation de la requête.";
+            echo "<script>alert('Erreur lors de la préparation de la requête.'); window.location.href='modifier.html';</script>";
         }
     }
 } elseif ($action === 'getQuestions') {
@@ -118,13 +118,13 @@ if ($action === 'getQuizzes') {
         if ($stmt) {
             $stmt->bind_param("sssssi", $question_text, $option1, $option2, $option3, $correct_option, $id);
             if ($stmt->execute()) {
-                echo "Question mise à jour avec succès.";
+                echo "<script>alert('Question mise à jour avec succès.'); window.location.href='modifier.html';</script>";
             } else {
-                echo "Erreur lors de la mise à jour de la question.";
+                echo "<script>alert('Erreur lors de la mise à jour de la question.'); window.location.href='modifier.html';</script>";
             }
             $stmt->close();
         } else {
-            echo "Erreur lors de la préparation de la requête.";
+            echo "<script>alert('Erreur lors de la préparation de la requête.'); window.location.href='modifier.html';</script>";
         }
     }
 } elseif ($action === 'deleteQuestion') {
@@ -135,13 +135,13 @@ if ($action === 'getQuizzes') {
         if ($stmt) {
             $stmt->bind_param("i", $id);
             if ($stmt->execute()) {
-                echo "Question supprimée avec succès.";
+                echo "<script>alert('Question supprimée avec succès.'); window.location.href='modifier.html';</script>";
             } else {
-                echo "Erreur lors de la suppression de la question.";
+                echo "<script>alert('Erreur lors de la suppression de la question.'); window.location.href='modifier.html';</script>";
             }
             $stmt->close();
         } else {
-            echo "Erreur lors de la préparation de la requête.";
+            echo "<script>alert('Erreur lors de la préparation de la requête.'); window.location.href='modifier.html';</script>";
         }
     }
 }
