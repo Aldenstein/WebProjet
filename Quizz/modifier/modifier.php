@@ -1,109 +1,155 @@
 <?php
-session_start();
+// Assurez-vous qu'il n'y a pas d'espaces ou de caractères avant cette ligne
+ob_start(); // Démarre la mise en tampon de sortie
+session_start(); // Démarrage de la session
 
+// Activer l'affichage des erreurs pour le débogage
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Connexion à la base de données
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "projetweb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 if ($conn->connect_error) {
     die("Erreur de connexion à la base de données : " . $conn->connect_error);
 }
 
+// Récupérer l'action demandée
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 if ($action === 'getQuizzes') {
+    // Récupérer tous les quizzes
     $result = $conn->query("SELECT id, title FROM quizzes");
-    if ($result) {
-        if ($result->num_rows > 0) {
-            while ($quiz = $result->fetch_assoc()) {
-                echo '<div class="quiz-item">';
-                echo '<span class="quiz-title" data-id="' . $quiz['id'] . '">' . htmlspecialchars($quiz['title']) . '</span>';
-                echo '<button onclick="deleteQuiz(' . $quiz['id'] . ')">Supprimer</button>';
-                echo '</div>';
-            }
-        } else {
-            echo '<p>Aucun quiz trouvé.</p>';
-        }
-    } else {
-        echo '<p>Erreur lors de la récupération des quizzes : ' . $conn->error . '</p>';
-    }
-} elseif ($action === 'deleteQuiz') {
-    $id = intval($_GET['id']);
-    $stmt = $conn->prepare("DELETE FROM quizzes WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    if ($stmt->execute()) {
-        echo "Quiz supprimé avec succès.";
-    } else {
-        echo "Erreur lors de la suppression du quiz : " . $stmt->error;
-    }
-    $stmt->close();
-} elseif ($action === 'getQuestions') {
-    $quizId = intval($_GET['quizId']);
-    $stmt = $conn->prepare("SELECT id, question, question_type, option1, option2, option3, correct_option, formatted_answer FROM questions WHERE quiz_id = ?");
-    $stmt->bind_param("i", $quizId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        while ($question = $result->fetch_assoc()) {
-            echo '<div class="question-item">';
-            echo '<input type="text" value="' . htmlspecialchars($question['question']) . '" data-id="' . $question['id'] . '" class="question-text" />';
-            
-            if ($question['question_type'] === 'QCM') {
-                echo '<input type="text" value="' . htmlspecialchars($question['option1']) . '" placeholder="Option 1" class="option" data-option="1" data-id="' . $question['id'] . '" />';
-                echo '<input type="text" value="' . htmlspecialchars($question['option2']) . '" placeholder="Option 2" class="option" data-option="2" data-id="' . $question['id'] . '" />';
-                echo '<input type="text" value="' . htmlspecialchars($question['option3']) . '" placeholder="Option 3" class="option" data-option="3" data-id="' . $question['id'] . '" />';
-                echo '<input type="text" value="' . htmlspecialchars($question['correct_option']) . '" placeholder="Réponse correcte" class="correct-option" data-id="' . $question['id'] . '" />';
-            } elseif ($question['question_type'] === 'Ouverte') {
-                echo '<textarea placeholder="Réponse préformatée" class="formatted-answer" data-id="' . $question['id'] . '">' . htmlspecialchars($question['formatted_answer']) . '</textarea>';
-            }
-
-            echo '<button onclick="deleteQuestion(' . $question['id'] . ')">Supprimer</button>';
+    if ($result && $result->num_rows > 0) {
+        while ($quiz = $result->fetch_assoc()) {
+            echo '<div>';
+            // Transforme le titre du quiz en bouton
+            echo '<form method="GET" action="modifier.php" style="display:inline;">';
+            echo '<input type="hidden" name="action" value="getQuestions">';
+            echo '<input type="hidden" name="quizId" value="' . $quiz['id'] . '">';
+            echo '<button type="submit">' . htmlspecialchars($quiz['title']) . '</button>';
+            echo '</form>';
+            echo '<form method="POST" action="modifier.php?action=deleteQuiz" style="display:inline;">';
+            echo '<input type="hidden" name="id" value="' . $quiz['id'] . '">';
+            echo '<button type="submit">Supprimer</button>';
+            echo '</form>';
             echo '</div>';
         }
     } else {
-        echo '<p>Aucune question trouvée pour ce quiz.</p>';
+        echo '<p>Aucun quiz trouvé.</p>';
     }
-    $stmt->close();
+} elseif ($action === 'deleteQuiz') {
+    // Supprimer un quiz
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+        $id = intval($_POST['id']);
+        $stmt = $conn->prepare("DELETE FROM quizzes WHERE id = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                echo "Quiz supprimé avec succès.";
+            } else {
+                echo "Erreur lors de la suppression du quiz.";
+            }
+            $stmt->close();
+        } else {
+            echo "Erreur lors de la préparation de la requête.";
+        }
+    }
+} elseif ($action === 'getQuestions') {
+    // Récupérer les questions d'un quiz
+    if (isset($_GET['quizId'])) {
+        $quizId = intval($_GET['quizId']);
+        $stmt = $conn->prepare("SELECT id, question_text, option1, option2, option3, correct_option FROM questions WHERE quiz_id = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $quizId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                while ($question = $result->fetch_assoc()) {
+                    echo '<div>';
+                    echo '<form method="POST" action="modifier.php?action=saveQuestion">';
+                    echo '<input type="hidden" name="id" value="' . $question['id'] . '">';
+                    echo '<label>Question :</label>';
+                    echo '<input type="text" name="question_text" value="' . htmlspecialchars($question['question_text']) . '">';
+                    echo '<label>Option 1 :</label>';
+                    echo '<input type="text" name="option1" value="' . htmlspecialchars($question['option1']) . '">';
+                    echo '<label>Option 2 :</label>';
+                    echo '<input type="text" name="option2" value="' . htmlspecialchars($question['option2']) . '">';
+                    echo '<label>Option 3 :</label>';
+                    echo '<input type="text" name="option3" value="' . htmlspecialchars($question['option3']) . '">';
+                    echo '<label>Réponse correcte :</label>';
+                    echo '<input type="text" name="correct_option" value="' . htmlspecialchars($question['correct_option']) . '">';
+                    echo '<button type="submit">Mettre à jour</button>';
+                    echo '</form>';
+                    echo '<form method="POST" action="modifier.php?action=deleteQuestion" style="display:inline;">';
+                    echo '<input type="hidden" name="id" value="' . $question['id'] . '">';
+                    echo '<button type="submit">Supprimer</button>';
+                    echo '</form>';
+                    echo '</div>';
+                }
+            } else {
+                echo '<p>Aucune question trouvée pour ce quiz.</p>';
+            }
+            $stmt->close();
+        } else {
+            echo "Erreur lors de la préparation de la requête.";
+        }
+    }
+} elseif ($action === 'saveQuestion') {
+    // Mettre à jour une question
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = intval($_POST['id']);
+        $question_text = $_POST['question_text'];
+        $option1 = $_POST['option1'];
+        $option2 = $_POST['option2'];
+        $option3 = $_POST['option3'];
+        $correct_option = $_POST['correct_option'];
+
+        $stmt = $conn->prepare("
+            UPDATE questions 
+            SET question_text = ?, option1 = ?, option2 = ?, option3 = ?, correct_option = ? 
+            WHERE id = ?
+        ");
+        if ($stmt) {
+            $stmt->bind_param("sssssi", $question_text, $option1, $option2, $option3, $correct_option, $id);
+            if ($stmt->execute()) {
+                echo "Question mise à jour avec succès.";
+            } else {
+                echo "Erreur lors de la mise à jour de la question.";
+            }
+            $stmt->close();
+        } else {
+            echo "Erreur lors de la préparation de la requête.";
+        }
+    }
 } elseif ($action === 'deleteQuestion') {
-    $id = intval($_GET['id']);
-    $stmt = $conn->prepare("DELETE FROM questions WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    if ($stmt->execute()) {
-        echo "Question supprimée avec succès.";
-    } else {
-        echo "Erreur lors de la suppression de la question : " . $stmt->error;
-    }
-    $stmt->close();
-} elseif ($action === 'saveQuestions') {
-    $questions = json_decode(file_get_contents("php://input"), true);
-    foreach ($questions as $question) {
-        $id = intval($question['id']);
-        $text = $conn->real_escape_string($question['text']);
-        $type = $conn->real_escape_string($question['type']);
-
-        if ($type === 'QCM') {
-            $option1 = $conn->real_escape_string($question['option1']);
-            $option2 = $conn->real_escape_string($question['option2']);
-            $option3 = $conn->real_escape_string($question['option3']);
-            $correct_option = $conn->real_escape_string($question['correct_option']);
-            $stmt = $conn->prepare("UPDATE questions SET question = ?, option1 = ?, option2 = ?, option3 = ?, correct_option = ? WHERE id = ?");
-            $stmt->bind_param("sssssi", $text, $option1, $option2, $option3, $correct_option, $id);
-        } elseif ($type === 'Ouverte') {
-            $formatted_answer = $conn->real_escape_string($question['formatted_answer']);
-            $stmt = $conn->prepare("UPDATE questions SET question = ?, formatted_answer = ? WHERE id = ?");
-            $stmt->bind_param("ssi", $text, $formatted_answer, $id);
+    // Supprimer une question
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+        $id = intval($_POST['id']);
+        $stmt = $conn->prepare("DELETE FROM questions WHERE id = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                echo "Question supprimée avec succès.";
+            } else {
+                echo "Erreur lors de la suppression de la question.";
+            }
+            $stmt->close();
+        } else {
+            echo "Erreur lors de la préparation de la requête.";
         }
-
-        if (!$stmt->execute()) {
-            echo "Erreur lors de la mise à jour de la question ID $id : " . $stmt->error;
-        }
-        $stmt->close();
     }
 }
 
+// Fermer la connexion à la base de données
 $conn->close();
+
+// Envoyer la sortie tamponnée
+ob_end_flush();
 ?>
