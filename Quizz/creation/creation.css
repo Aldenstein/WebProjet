@@ -5,29 +5,56 @@
   font-style: normal;
   font-variation-settings:
     "wdth" 100;
+    font-family: "Open Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings:
+      "wdth" 100;
+}
+html {
+    overflow: hidden;
+}
+body{
+    background-color: #e6e6fa;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+}
+.card{
+    background-color: #f0f8ff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    width: 400px;
+    height: 300px;
+    margin: 10px;
+    padding: 15px;
+    text-align: center;
 }
 body {
   background-color: #e6e6fa;
-  margin: 0; /* Supprime les marges par défaut */
-  min-height: 100vh; /* Simule une page plus longue pour tester le scroll */
-  overflow-y: auto; /* Permet le défilement global sur toute la page */
+  margin: 0;
+  min-height: 100vh;
+  overflow-y: auto;
   display: flex;
-  justify-content: center; /* Centre la card horizontalement */
-  align-items: flex-start; /* Aligne la card en haut de la page */
-  padding: 20px; /* Ajoute un espace autour de la card */
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
 }
 
 .card {
   background-color: #f0f8ff;
   border-radius: 10px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-  width: 300px; /* Largeur fixe */
-  min-height: 500px; /* Hauteur minimale pour la card */
-  position: relative; /* Permet à la card de s'adapter à son contenu */
+  width: 300px;
+  min-height: 500px;
+  position: relative;
   padding: 15px;
   text-align: center;
-  overflow: visible; /* Permet au contenu de dépasser si nécessaire */
-  margin-top: 20px; /* Ajoute un espace en haut pour éviter qu'elle touche le bord */
+  overflow: visible;
+  margin-top: 20px;
 }
 
 .card h1{
