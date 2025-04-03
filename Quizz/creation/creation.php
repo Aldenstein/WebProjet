@@ -62,10 +62,7 @@ if ($question_type === "QCM") {
     $option1 = isset($_POST['option1']) ? trim($_POST['option1']) : '';
     $option2 = isset($_POST['option2']) ? trim($_POST['option2']) : '';
     $option3 = isset($_POST['option3']) ? trim($_POST['option3']) : '';
-    $correct_option = isset($_POST['correct_option']) ? trim($_POST['correct_option']) : '';
-
-    // On stocke l'index de l'option correcte (1, 2 ou 3)
-    $correct_option = $correct_option;
+    $correct_option = isset($_POST['correct_optio']) ? trim($_POST['correct_optio']) : '';
 
 } elseif ($question_type === "Vrai/Faux") {
     $correct_option = isset($_POST['correct_option']) ? trim($_POST['correct_option']) : '';
