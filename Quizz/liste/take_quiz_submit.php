@@ -90,6 +90,19 @@ $stmt_score->close();
     <link rel="icon" href="../images/icone.jpg">
 </head>
 <body>
+    <div class="navbar">
+        <button name="timer" value="timer" id="homebtn" class="btn">    
+            <a href="../index.html">        
+                <img src="../images/home.jpg" alt="send" width="40px" height="40px">
+            </a> 
+        </button>
+        <h1 align="center">Bienvenue sur Ctrl+Quizz !</h1>
+        <button type="submit" name="deconnexion" value="deco" id="decobtn" class="btn">
+            <a href="../deco/deco.html">            
+                <img src="../images/deco.jpg" alt="send" width="40px" height="40px">
+            </a>
+        </button>
+    </div>
     <div class="card">
         <h1>Resultats de votre Quizz</h1>
         <p>Quiz id : <?php echo htmlspecialchars($quiz_id); ?></p>
