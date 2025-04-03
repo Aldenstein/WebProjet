@@ -70,7 +70,8 @@ $conn->close();
             timer = setInterval(() => {
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('quiz-form').submit(); // soumet auto
+                    alert('Temps épuisé !'); // afficher une alerte
+                    window.location.href = '../liste/liste.html'; // rediriger vers liste.html
                 } else {
                     const minutes = Math.floor(timeLeft / 60);
                     const seconds = timeLeft % 60;
@@ -84,7 +85,7 @@ $conn->close();
     </script>
 </head>
 <body>
-	<div class="navbar">
+    <div class="navbar">
         <button name="timer" value="timer" id="homebtn" class="btn">    
             <a href="../liste/liste.html">        
                 <img src="../images/home.jpg" alt="send" width="40px" height="40px">
