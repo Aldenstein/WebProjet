@@ -15,6 +15,7 @@ body {
   justify-content: center; /* Centre la card horizontalement */
   align-items: flex-start; /* Aligne la card en haut de la page */
   padding: 20px; /* Ajoute un espace autour de la card */
+  padding-top: 60px; /* Ajoute un espace pour éviter que la card chevauche la navbar */
 }
 
 .card {
@@ -27,7 +28,8 @@ body {
   padding: 15px;
   text-align: center;
   overflow: visible; /* Permet au contenu de dépasser si nécessaire */
-  margin-top: 20px; /* Ajoute un espace en haut pour éviter qu'elle touche le bord */
+  margin-top: 150px; /* Augmente l'espace entre la card et la navbar */
+  z-index: 1; /* Place la card en dessous de la navbar */
 }
 
 .card h1{
@@ -97,4 +99,28 @@ align-items: center;
 display: inline-block;
 justify-content: center;
 align-items: center;
+}
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 98%; /* Assure que la navbar occupe toute la largeur */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: transparent;
+  z-index: 9999; /* Place la navbar au-dessus de tout */
+  margin: 0; /* Supprime toute marge éventuelle */
+}
+.navbar button {
+  background: none;
+  border: none;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+}
+.navbar h1 {
+  margin: 0;
+  font-size: 2rem;
 }
