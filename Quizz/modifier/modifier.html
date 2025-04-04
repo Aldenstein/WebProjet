@@ -5,8 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ctrl+Quizz - Modifier les Quizz</title>
     <link rel="stylesheet" href="modifier.css">
-    <script src="modifier.js" defer></script>
     <link rel="icon" href="../images/icone.jpg">
+    <script>
+        // Charger la liste des quiz dynamiquement
+        function loadQuizzes() {
+            const quizList = document.getElementById('quiz-list');
+            fetch('modifier.php?action=getQuizzes')
+                .then(response => response.text())
+                .then(data => {
+                    quizList.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des quizzes :', error);
+                    quizList.innerHTML = '<p>Erreur lors du chargement des quizzes.</p>';
+                });
+        }
+
+        // Charger les quiz au chargement de la page
+        window.onload = loadQuizzes;
+    </script>
 </head>
 <body>
     <div class="card">
@@ -14,16 +31,6 @@
         <div id="quiz-list">
             <!-- Les quiz seront chargés dynamiquement ici -->
         </div>
-    </div>
-
-    <div class="card" id="question-editor" style="display: none;">
-        <h1 id="quiz-title">Questions du Quiz</h1>
-        <form id="question-form">
-            <div id="question-list">
-                <!-- Les questions seront chargées dynamiquement ici -->
-            </div>
-            <button type="submit" class="btn">Sauvegarder les modifications</button>
-        </form>
     </div>
 </body>
 </html>

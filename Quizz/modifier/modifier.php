@@ -1,36 +1,40 @@
 <?php
-// demarre session
-session_start();
+// Assurez-vous qu'il n'y a pas d'espaces ou de caractères avant cette ligne
+ob_start(); // Démarre la mise en tampon de sortie
+session_start(); // Démarrage de la session
 
-// connexion a la bdd
+// Activer l'affichage des erreurs pour le débogage
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Connexion à la base de données
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "projetweb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
-
-// verifier connexion
 if ($conn->connect_error) {
-    die("erreur connexion : " . $conn->connect_error);
+    die("Erreur de connexion à la base de données : " . $conn->connect_error);
 }
 
-// recup action
+// Récupérer l'action demandée
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 if ($action === 'getQuizzes') {
-    // recup tous les quizzes
+    // Récupérer tous les quizzes
     $result = $conn->query("SELECT id, title FROM quizzes");
     if ($result && $result->num_rows > 0) {
         while ($quiz = $result->fetch_assoc()) {
             echo '<div>';
-            // bouton pour voir questions
+            // Bouton pour afficher les questions du quiz
             echo '<form method="GET" action="modifier.php" style="display:inline;">';
             echo '<input type="hidden" name="action" value="getQuestions">';
             echo '<input type="hidden" name="quizId" value="' . $quiz['id'] . '">';
             echo '<button type="submit">' . htmlspecialchars($quiz['title']) . '</button>';
             echo '</form>';
-            // bouton pour supprimer quiz
+            // Bouton pour supprimer le quiz
             echo '<form method="POST" action="modifier.php?action=deleteQuiz" style="display:inline;">';
             echo '<input type="hidden" name="id" value="' . $quiz['id'] . '">';
             echo '<button type="submit">Supprimer</button>';
@@ -41,7 +45,7 @@ if ($action === 'getQuizzes') {
         echo '<p>Aucun quiz trouvé.</p>';
     }
 } elseif ($action === 'deleteQuiz') {
-    // supprimer un quiz
+    // Supprimer un quiz
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         $id = intval($_POST['id']);
         $stmt = $conn->prepare("DELETE FROM quizzes WHERE id = ?");
@@ -58,7 +62,7 @@ if ($action === 'getQuizzes') {
         }
     }
 } elseif ($action === 'getQuestions') {
-    // recup questions d'un quiz
+    // Récupérer les questions d'un quiz
     if (isset($_GET['quizId'])) {
         $quizId = intval($_GET['quizId']);
         $stmt = $conn->prepare("SELECT id, question_text, option1, option2, option3, correct_option FROM questions WHERE quiz_id = ?");
@@ -70,7 +74,6 @@ if ($action === 'getQuizzes') {
             if ($result->num_rows > 0) {
                 while ($question = $result->fetch_assoc()) {
                     echo '<div>';
-                    // formulaire pour modifier question
                     echo '<form method="POST" action="modifier.php?action=saveQuestion">';
                     echo '<input type="hidden" name="id" value="' . $question['id'] . '">';
                     echo '<label>Question :</label>';
@@ -85,7 +88,6 @@ if ($action === 'getQuizzes') {
                     echo '<input type="text" name="correct_option" value="' . htmlspecialchars($question['correct_option']) . '">';
                     echo '<button type="submit">Mettre à jour</button>';
                     echo '</form>';
-                    // bouton pour supprimer question
                     echo '<form method="POST" action="modifier.php?action=deleteQuestion" style="display:inline;">';
                     echo '<input type="hidden" name="id" value="' . $question['id'] . '">';
                     echo '<button type="submit">Supprimer</button>';
@@ -101,7 +103,7 @@ if ($action === 'getQuizzes') {
         }
     }
 } elseif ($action === 'saveQuestion') {
-    // mettre a jour une question
+    // Mettre à jour une question
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = intval($_POST['id']);
         $question_text = $_POST['question_text'];
@@ -128,7 +130,7 @@ if ($action === 'getQuizzes') {
         }
     }
 } elseif ($action === 'deleteQuestion') {
-    // supprimer une question
+    // Supprimer une question
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         $id = intval($_POST['id']);
         $stmt = $conn->prepare("DELETE FROM questions WHERE id = ?");
@@ -146,9 +148,9 @@ if ($action === 'getQuizzes') {
     }
 }
 
-// fermer connexion
+// Fermer la connexion à la base de données
 $conn->close();
 
-// envoyer sortie tamponnée
+// Envoyer la sortie tamponnée
 ob_end_flush();
 ?>
