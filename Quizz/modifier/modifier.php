@@ -32,12 +32,12 @@ if ($action === 'getQuizzes') {
             echo '<form method="GET" action="modifier.php" style="display:inline;">';
             echo '<input type="hidden" name="action" value="getQuestions">';
             echo '<input type="hidden" name="quizId" value="' . $quiz['id'] . '">';
-            echo '<button type="submit">' . htmlspecialchars($quiz['title']) . '</button>';
+            echo '<button type="submit" class="button">' . htmlspecialchars($quiz['title']) . '</button>';
             echo '</form>';
             // Bouton pour supprimer le quiz
             echo '<form method="POST" action="modifier.php?action=deleteQuiz" style="display:inline;">';
             echo '<input type="hidden" name="id" value="' . $quiz['id'] . '">';
-            echo '<button type="submit">Supprimer</button>';
+            echo '<button type="submit" class="btn"><img src="../images/poubelle.png" width="20px" height="20px"></button>';
             echo '</form>';
             echo '</div>';
         }
