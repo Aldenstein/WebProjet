@@ -1,8 +1,8 @@
 <?php
-// demarre session
+// démarrer la session
 session_start();
 
-// connexion a la bdd
+// connexion à la base de données
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -10,70 +10,89 @@ $dbname = "projetweb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// verifier connexion
+// vérifier la connexion
 if ($conn->connect_error) {
-    die("erreur connexion : " . $conn->connect_error);
+    echo "<script>
+            alert('Erreur de connexion à la base de données : " . $conn->connect_error . "');
+            window.location.href = 'index.html';
+          </script>";
+    exit;
 }
 
-// recupere pseudo et mdp
-$pseudo = $_POST['pseudo'];
-$mdp = $_POST['mdp'];
-$action = $_POST['action'];
+// récupérer pseudo, mot de passe et action
+$pseudo = isset($_POST['pseudo']) ? $_POST['pseudo'] : '';
+$mdp = isset($_POST['mdp']) ? $_POST['mdp'] : '';
+$action = isset($_POST['action']) ? $_POST['action'] : '';
 
 if ($action == 'register') {
-    // verifier si user existe
+    // vérifier si l'utilisateur existe déjà
     $sql = "SELECT * FROM users WHERE pseudo='$pseudo'";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
-        // user deja existant
-        echo "User already exists!";
+        // utilisateur déjà existant
+        echo "<script>
+                alert('Utilisateur déjà existant !');
+                window.location.href = 'index.html';
+              </script>";
     } else {
-        // creer user
+        // créer un nouvel utilisateur
         $hashed_password = password_hash($mdp, PASSWORD_DEFAULT);
         $sql = "INSERT INTO users (pseudo, mdp, active) VALUES ('$pseudo', '$hashed_password', false)";
         if ($conn->query($sql) === TRUE) {
             echo "<script>
-                    alert('Compte créé avec succès, vous pouvez vous connecter');
-                    document.getElementById('Pseudo').value = '';
-                    document.getElementById('mdp').value = '';
+                    alert('Compte créé avec succès, vous pouvez vous connecter.');
+                    window.location.href = 'index.html';
                   </script>";
-            header("Location: index.html");
-            exit();
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo "<script>
+                    alert('Erreur lors de la création du compte : " . $conn->error . "');
+                    window.location.href = 'index.html';
+                  </script>";
         }
     }
 } elseif ($action == 'login') {
-    // verifier si user existe
+    // vérifier si l'utilisateur existe
     $sql = "SELECT * FROM users WHERE pseudo='$pseudo'";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-        // verifier mdp
+        // vérifier le mot de passe
         if (password_verify($mdp, $row['mdp'])) {
-            // stocker id user dans session
+            // stocker l'ID utilisateur dans la session
             $_SESSION['user_id'] = $row['id'];
 
             if ($row['active'] == 1) {
-                // rediriger admin
+                // rediriger l'administrateur
                 header("Location: admin/admin.html");
             } else {
-                // rediriger user
+                // rediriger l'utilisateur
                 header("Location: liste/liste.html");
             }
             exit();
         } else {
-            // mauvais mdp
-            header("Location: invalide/invalide.html");
+            // mot de passe incorrect
+            echo "<script>
+                    alert('Mot de passe incorrect.');
+                    window.location.href = 'index.html';
+                  </script>";
         }
     } else {
-        // user pas trouvé
-        echo "Invalid username or password!";
+        // utilisateur non trouvé
+        echo "<script>
+                alert('Nom d\'utilisateur ou mot de passe invalide.');
+                window.location.href = 'index.html';
+              </script>";
     }
+} else {
+    // action non valide
+    echo "<script>
+            alert('Action non valide.');
+            window.location.href = 'index.html';
+          </script>";
 }
 
-// fermer connexion
+// fermer la connexion
 $conn->close();
 ?>
