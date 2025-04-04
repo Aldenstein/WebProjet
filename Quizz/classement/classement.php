@@ -38,7 +38,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classement - Ctrl+Quizz</title>
+    <title>Ctrl+Quizz</title>
     <link rel="stylesheet" href="classement.css">
     <link rel="icon" href="../images/icone.jpg">
 </head>

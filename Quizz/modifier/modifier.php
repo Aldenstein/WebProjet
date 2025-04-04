@@ -122,8 +122,9 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier les Quizzes</title>
+    <title>Ctrl+Quizz</title>
     <link rel="stylesheet" href="modifier.css">
+    <link rel="icon" href="../images/icone.jpg">
 </head>
 <body>
     <div class="navbar">
@@ -132,7 +133,7 @@ $conn->close();
                 <img src="../images/home.jpg" alt="Accueil" width="40px" height="40px">
             </a>
         </button>
-        <h1 align="center">Modifier les Quizzes</h1>
+        <h1 align="center">Modifier les Quizz</h1>
         <button id="decobtn" class="btn">
             <a href="../deco/deco.html">
                 <img src="../images/deco.jpg" alt="Déconnexion" width="40px" height="40px">
@@ -176,7 +177,7 @@ $conn->close();
                             <input type="text" name="option3" value="<?php echo htmlspecialchars($question['option3']); ?>">
                             <label>Réponse correcte :</label>
                             <input type="text" name="correct_option" value="<?php echo htmlspecialchars($question['correct_option']); ?>">
-                            <button type="submit">Mettre à jour</button>
+                            <button type="submit" class="btn"><img src="../images/save.png" width="20px" height="20px"></button>
                         </form>
                         <form method="POST" action="modifier.php?action=deleteQuestion" style="display:inline;">
                             <input type="hidden" name="id" value="<?php echo $question['id']; ?>">
