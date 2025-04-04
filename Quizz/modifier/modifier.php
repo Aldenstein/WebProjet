@@ -90,7 +90,7 @@ if ($action === 'getQuizzes') {
                     echo '</form>';
                     echo '<form method="POST" action="modifier.php?action=deleteQuestion" style="display:inline;">';
                     echo '<input type="hidden" name="id" value="' . $question['id'] . '">';
-                    echo '<button type="submit">Supprimer</button>';
+                    echo '<button type="submit" class="btn"><img src="../images/poubelle.png" width="20px" height="20px"></button>';
                     echo '</form>';
                     echo '</div>';
                 }
