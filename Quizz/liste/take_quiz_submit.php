@@ -1,5 +1,5 @@
 <?php
-session_start(); // demarre session
+session_start(); // démarrer la session
 
 $servername = "localhost";
 $username = "root";
@@ -8,33 +8,37 @@ $dbname = "projetweb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// verifier connexion
+// vérifier connexion
 if ($conn->connect_error) {
-    die("erreur connexion : " . $conn->connect_error);
+    echo "<script>alert('Erreur de connexion à la base de données : " . $conn->connect_error . "');</script>";
+    exit;
 }
 
-// verifier si user connecte
+// vérifier si user connecté
 if (!isset($_SESSION['user_id'])) {
-    die("pas d'utilisateur connecte");
+    echo "<script>alert('Pas d'utilisateur connecté');</script>";
+    exit;
 }
 
-$user_id = $_SESSION['user_id']; // recup id user
+$user_id = $_SESSION['user_id']; // récupérer id user
 
-// verifier si quiz_id present
+// vérifier si quiz_id présent
 if (!isset($_GET['quiz_id']) || !is_numeric($_GET['quiz_id'])) {
-    die("quiz id manquant ou invalide");
+    echo "<script>alert('Quiz ID manquant ou invalide');</script>";
+    exit;
 }
 
 $quiz_id = (int)$_GET['quiz_id'];
 $score = 0;
 
-// recup questions du quiz
+// récupérer questions du quiz
 $sql_questions = "SELECT id, question_type, correct_option FROM questions WHERE quiz_id = ?";
 $stmt_questions = $conn->prepare($sql_questions);
 
-// verifier requete
+// vérifier requête
 if (!$stmt_questions) {
-    die("erreur requete : " . $conn->error);
+    echo "<script>alert('Erreur lors de la préparation de la requête : " . $conn->error . "');</script>";
+    exit;
 }
 
 $stmt_questions->bind_param("i", $quiz_id);
@@ -47,39 +51,46 @@ $total_questions = $result_questions->num_rows;
 while ($question = $result_questions->fetch_assoc()) {
     $question_id = $question['id'];
     $question_type = $question['question_type'];
-    $correct_option = strtolower(trim($question['correct_option'])); // bonne reponse
+    $correct_option = strtolower(trim($question['correct_option'])); // bonne réponse
 
     if ($question_type === "QCM" || $question_type === "Vrai/Faux") {
-        // verifier reponse user
-        if (isset($_POST['answer'][$question_id]) && strtolower(trim($_POST['answer'][$question_id])) === $correct_option) {
-            $score++;
+        // vérifier réponse utilisateur
+        if (isset($_POST['answer'][$question_id])) {
+            $user_answer = strtolower(trim($_POST['answer'][$question_id]));
+            if ($user_answer === $correct_option) {
+                $score++;
+            }
         }
     } elseif ($question_type === "Ouverte") {
-        // verifier reponse ouverte
-        if (isset($_POST['answer'][$question_id]) && strtolower(trim($_POST['answer'][$question_id])) === $correct_option) {
-            $score++;
+        // vérifier réponse ouverte
+        if (isset($_POST['answer'][$question_id])) {
+            $user_answer = strtolower(trim($_POST['answer'][$question_id]));
+            if ($user_answer === $correct_option) {
+                $score++;
+            }
         }
     }
 }
 
-// mettre a jour score user
+// mettre à jour score utilisateur
 $stmt_score = $conn->prepare("UPDATE users SET score = COALESCE(score, 0) + ? WHERE id = ?");
 if (!$stmt_score) {
-    die("erreur mise a jour score : " . $conn->error);
+    echo "<script>alert('Erreur lors de la mise à jour du score : " . $conn->error . "');</script>";
+    exit;
 }
 
-$increment = $score; // ajouter score calcule
+$increment = $score; // ajouter score calculé
 $stmt_score->bind_param("ii", $increment, $user_id);
 $stmt_score->execute();
 
 if ($stmt_score->affected_rows === 0) {
-    die("score pas mis a jour");
+    echo "<script>alert('Score non mis à jour');</script>";
+    exit;
 }
 
 $stmt_score->close();
-
-// afficher resultats
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -104,7 +115,7 @@ $stmt_score->close();
         </button>
     </div>
     <div class="card">
-        <h1>Resultats de votre Quizz</h1>
+        <h1>Résultats de votre Quizz</h1>
         <p>Quiz id : <?php echo htmlspecialchars($quiz_id); ?></p>
         <p>Score : <?php echo htmlspecialchars($score); ?> / <?php echo htmlspecialchars($total_questions); ?></p>
         <button id="btnautrequiz" class="btn">
