@@ -74,48 +74,79 @@ if ($total_questions === 0) {
         .progress-bar {
             height: 20px;
             width: 0;
-            background-color: #4caf50;
+            background-color: #184766;
             border-radius: 5px;
             transition: width 0.5s;
         }
-
+        .btn{
+            background-color:transparent;
+            border: none;
+            padding: 10px;
+            border-radius: 50px;
+            margin-top: 1.5em;
+            font-size: 1em;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .btn img{
+            display: inline-block;
+            justify-content: center;
+            align-items: center;
+        }
         /* Styles pour la navbar */
         .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 98%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #4caf50;
-            padding: 10px;
+            padding: 10px 20px;
+            background: transparent;
         }
-
+        .navbar button {
+            background: none;
+            border: none;
+            color: black;
+            font-size: 16px;
+            cursor: pointer;
+        }
         .navbar h1 {
             margin: 0;
-            color: white;
+            font-size: 2rem;
         }
-
-        /* Styles pour les boutons */
-        .btn {
-            background-color: transparent;
-            border: none;
+        * {
+            font-family: "Open Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
+            font-style: normal;
+            font-variation-settings:
+            "wdth" 100;
         }
-
-        .btn img {
-            width: 40px;
-            height: 40px;
+        body{
+            background-color: #e6e6fa;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
         }
-
-        /* Styles pour la carte */
-        .card {
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
+        .card{
+            max-width: 800px;
             margin: 20px auto;
-            max-width: 600px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            width: 800px;
+            text-align: center;
         }
 
-        /* Styles pour les questions */
-        .question {
-            margin-bottom: 20px;
+        .card h1{
+            font-size: 2rem;
         }
     </style>
 </head>
@@ -124,13 +155,13 @@ if ($total_questions === 0) {
     <div class="navbar">
         <button name="timer" value="timer" id="homebtn" class="btn">
             <a href="../liste/liste.html">
-                <img src="../images/home.jpg" alt="send">
+                <img src="../images/home.jpg" alt="send" width="40px" height="40px">
             </a>
         </button>
         <h1 align="center">Bienvenue sur Ctrl+Quizz !</h1>
         <button type="submit" name="deconnexion" value="deco" id="decobtn" class="btn">
             <a href="../deco/deco.html">
-                <img src="../images/deco.jpg" alt="send">
+                <img src="../images/deco.jpg" alt="send" width="40px" height="40px">
             </a>
         </button>
     </div>

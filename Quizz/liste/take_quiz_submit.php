@@ -71,8 +71,9 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Résultats du Quiz</title>
+    <title>Ctrl+Quizz</title>
     <link rel="stylesheet" href="take_quiz.css">
+    <link rel="icon" href="../images/icone.jpg">
 </head>
 <body>
     <div class="card">
@@ -86,7 +87,11 @@ $conn->close();
                 </div>
             <?php endforeach; ?>
         </div>
-        <a href="liste.html" class="btn">Retour à la liste des Quiz</a>
+        <button type="submit" id="btn" class="btn">
+            <a href="../liste/liste.html">
+                <img src="../images/pin.jpg" alt="Envoyer" width="40px" height="40px">
+            </a>
+        </button>
     </div>
 </body>
 </html>
