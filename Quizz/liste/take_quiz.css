@@ -115,3 +115,18 @@ body{
     margin: 0;
     font-size: 2rem;
 }
+
+.progress-bar-container {
+  width: 100%;
+  background-color: #e0e0e0;
+  border-radius: 25px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  height: 20px;
+  width: 0%;
+  background-color: lavender;
+  transition: width 0.3s ease;
+}
