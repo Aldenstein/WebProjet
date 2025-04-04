@@ -1,3 +1,38 @@
+<?php
+// Connexion à la base de données
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "projetweb";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Vérifier la connexion
+if ($conn->connect_error) {
+    die("Erreur de connexion : " . $conn->connect_error);
+}
+
+// Récupérer les utilisateurs et leurs scores, triés par score décroissant, en excluant l'admin
+$sql = "SELECT pseudo, score FROM users WHERE active = '0' ORDER BY score DESC";
+$result = $conn->query($sql);
+
+// Vérifier si la requête a échoué
+if (!$result) {
+    die("Erreur dans la requête SQL : " . $conn->error);
+}
+
+// Stocker les résultats dans un tableau
+$users = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $users[] = $row;
+    }
+}
+
+// Fermer la connexion
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -17,7 +52,7 @@
         <h1 align="center">Classement des Joueurs</h1>
     </div>
     <div class="card">
-        <h2>Top Joueurs</h2>
+        <h2>Classement</h2>
         <table>
             <thead>
                 <tr>
@@ -32,7 +67,7 @@
                     <?php foreach ($users as $user): ?>
                         <tr>
                             <td><?php echo $position++; ?></td>
-                            <td><?php echo htmlspecialchars($user['username']); ?></td>
+                            <td><?php echo htmlspecialchars($user['pseudo']); ?></td>
                             <td><?php echo htmlspecialchars($user['score']); ?></td>
                         </tr>
                     <?php endforeach; ?>
