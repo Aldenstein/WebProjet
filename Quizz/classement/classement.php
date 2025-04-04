@@ -45,11 +45,16 @@ $conn->close();
 <body>
     <div class="navbar">
         <button id="homebtn" class="btn">
-            <a href="../liste/liste.html">
+            <a href="../index.html">
                 <img src="../images/home.jpg" alt="Accueil" width="40px" height="40px">
             </a>
         </button>
-        <h1 align="center">Classement des Joueurs</h1>
+        <h1 align="center">Classement des Utilisateurs !</h1>
+        <button id="decobtn" class="btn">
+            <a href="../deco/deco.html">
+                <img src="../images/deco.jpg" alt="Déconnexion" width="40px" height="40px">
+            </a>
+        </button>
     </div>
     <div class="card">
         <h2>Classement</h2>
