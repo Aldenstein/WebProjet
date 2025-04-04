@@ -1,8 +1,6 @@
 <?php
-// demarre session
-session_start();
+session_start(); // démarrer la session
 
-// connexion a la bdd
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -10,43 +8,48 @@ $dbname = "projetweb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// verifier connexion
+// vérifier connexion
 if ($conn->connect_error) {
-    die("erreur connexion : " . $conn->connect_error);
+    echo "<script>alert('Erreur de connexion à la base de données : " . $conn->connect_error . "');</script>";
+    exit;
 }
 
-// verifier si quiz_id present
+// vérifier si user connecté
+if (!isset($_SESSION['user_id'])) {
+    echo "<script>alert('Pas d'utilisateur connecté');</script>";
+    exit;
+}
+
+$user_id = $_SESSION['user_id']; // récupérer id user
+
+// vérifier si quiz_id présent
 if (!isset($_GET['quiz_id']) || !is_numeric($_GET['quiz_id'])) {
-    die("quiz id manquant ou invalide");
+    echo "<script>alert('Quiz ID manquant ou invalide');</script>";
+    exit;
 }
 
 $quiz_id = (int)$_GET['quiz_id'];
 
-// recup titre du quiz
-$sql_quiz = "SELECT title FROM quizzes WHERE id = ?";
-$stmt_quiz = $conn->prepare($sql_quiz);
-$stmt_quiz->bind_param("i", $quiz_id);
-$stmt_quiz->execute();
-$result_quiz = $stmt_quiz->get_result();
+// récupérer questions du quiz
+$sql_questions = "SELECT id, question_text, question_type, option1, option2, option3, correct_option FROM questions WHERE quiz_id = ?";
+$stmt_questions = $conn->prepare($sql_questions);
 
-// verifier si quiz existe
-if ($result_quiz->num_rows === 0) {
-    die("quiz non trouvé");
+// vérifier requête
+if (!$stmt_questions) {
+    echo "<script>alert('Erreur lors de la préparation de la requête : " . $conn->error . "');</script>";
+    exit;
 }
 
-$quiz = $result_quiz->fetch_assoc();
-$quiz_title = $quiz['title'];
-
-// recup questions du quiz
-$sql_questions = "SELECT * FROM questions WHERE quiz_id = ?";
-$stmt_questions = $conn->prepare($sql_questions);
 $stmt_questions->bind_param("i", $quiz_id);
 $stmt_questions->execute();
 $result_questions = $stmt_questions->get_result();
 
-$stmt_quiz->close();
-$stmt_questions->close();
-$conn->close();
+$total_questions = $result_questions->num_rows;
+
+if ($total_questions === 0) {
+    echo "<script>alert('Aucune question trouvée pour ce quiz.');</script>";
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -54,35 +57,74 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ctrl+Quizz - <?php echo htmlspecialchars($quiz_title); ?></title>
+    <title>Ctrl+Quizz - Questions</title>
     <link rel="stylesheet" href="take_quiz.css">
     <link rel="icon" href="../images/icone.jpg">
-    <script>
-        // timer pour le quiz
-        let timePerQuestion = 8; // secondes par question
-        let totalQuestions = <?php echo $result_questions->num_rows; ?>;
-        let timeLeft = totalQuestions * timePerQuestion; // temps total
-        let timer;
-
-        // demarre le timer
-        function startTimer() {
-            const timerElement = document.getElementById('timer');
-
-            timer = setInterval(() => {
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    alert('Temps épuisé !'); // afficher une alerte
-                    window.location.href = '../liste/liste.html'; // rediriger vers liste.html
-                } else {
-                    const minutes = Math.floor(timeLeft / 60);
-                    const seconds = timeLeft % 60;
-                    timerElement.textContent = `Temps restant : ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                    timeLeft--;
-                }
-            }, 1000);
+    <style>
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 25px;
+            overflow: hidden;
+            margin-bottom: 10px;
         }
 
-        window.onload = startTimer;
+        .progress-bar {
+            height: 20px;
+            width: 0%;
+            background-color: #76c7c0;
+            transition: width 0.3s ease;
+        }
+    </style>
+    <script>
+        let currentQuestion = 0;
+        let totalQuestions = <?php echo $total_questions; ?>;
+
+        function startQuiz() {
+            const progressBar = document.getElementById('progressBar');
+            const timerElement = document.getElementById('timer');
+            const form = document.getElementById('quizForm');
+
+            function updateProgressBar() {
+                const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+
+            function showNextQuestion() {
+                const questions = document.querySelectorAll('.question');
+                questions.forEach((question, index) => {
+                    question.style.display = index === currentQuestion ? 'block' : 'none';
+                });
+                updateProgressBar();
+            }
+
+            function startTimer() {
+                let timer = 8; // 8 secondes par question
+                timerElement.textContent = `Temps restant : ${timer} secondes`;
+
+                const interval = setInterval(() => {
+                    if (timer > 0) {
+                        timer--;
+                        timerElement.textContent = `Temps restant : ${timer} secondes`;
+                    } else {
+                        clearInterval(interval);
+                        currentQuestion++;
+                        if (currentQuestion < totalQuestions) {
+                            showNextQuestion();
+                            startTimer();
+                        } else {
+                            form.submit(); // Soumettre le formulaire automatiquement à la fin
+                            window.location.href = "liste.html";
+                        }
+                    }
+                }, 1000);
+            }
+
+            showNextQuestion();
+            startTimer();
+        }
+
+        window.onload = startQuiz;
     </script>
 </head>
 <body>
@@ -99,66 +141,47 @@ $conn->close();
             </a>
         </button>
     </div>
-    <div id="timer"></div>
     <div class="card">
-        <h1>Quiz : <?php echo htmlspecialchars($quiz_title); ?></h1>
-
-        <?php if ($result_questions->num_rows > 0): ?>
-            <form id="quiz-form" method="POST" action="take_quiz_submit.php?quiz_id=<?php echo $quiz_id; ?>">
-                <?php
-                $question_number = 1;
-                while ($question = $result_questions->fetch_assoc()):
-                    $question_id = $question['id'];
-                    $question_type = $question['question_type'];
-                ?>
-                    <div class="question">
-                        <h3>Question <?php echo $question_number; ?> : <?php echo htmlspecialchars($question['question_text']); ?></h3>
-                        <div class="input-container">
-                            <?php if ($question_type === "QCM"): ?>
-                                <label>
-                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="1" required>
-                                    <?php echo htmlspecialchars($question['option1']); ?>
-                                </label><br>
-                                <label>
-                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="2">
-                                    <?php echo htmlspecialchars($question['option2']); ?>
-                                </label><br>
-                                <label>
-                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="3">
-                                    <?php echo htmlspecialchars($question['option3']); ?>
-                                </label><br>
-                            <?php elseif ($question_type === "Vrai/Faux"): ?>
-                                <label>
-                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="1" required>
-                                    Vrai
-                                </label><br>
-                                <label>
-                                    <input type="radio" name="answer[<?php echo $question_id; ?>]" value="0">
-                                    Faux
-                                </label><br>
-                            <?php elseif ($question_type === "Ouverte"): ?>
-                                <label>
-                                    <input type="text" name="answer[<?php echo $question_id; ?>]" placeholder="Votre réponse" required>
-                                </label><br>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                <?php
-                    $question_number++;
-                endwhile;
-                ?>
-                <button type="submit" name="action" value="register" id="btn" class="btn">             
-                    <img src="../images/save.png" alt="adduser" width="40px" height="40px">
-                </button>
-            </form>
-        <?php else: ?>
-            <p>Aucune question trouvée pour ce quiz.</p>
-            <button id="btnautrequiz" class="btn">
-            <a href="../liste/liste.html">
-                <img src="../images/plus.jpg" alt="Rejoindre un autre quizz" width="40px" height="40px">
-            </a>
-        </button>
-        <?php endif; ?>
+        <h1>Questions du Quizz</h1>
+        <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <p id="timer">Temps restant : 8 secondes</p>
+        <form id="quizForm" action="take_quiz_submit.php?quiz_id=<?php echo $quiz_id; ?>" method="POST">
+            <?php while ($question = $result_questions->fetch_assoc()): ?>
+                <div class="question" style="display: none;">
+                    <p><strong><?php echo htmlspecialchars($question['question_text']); ?></strong></p>
+                    <?php if ($question['question_type'] === "QCM"): ?>
+                        <label>
+                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="<?php echo htmlspecialchars($question['option1']); ?>" required>
+                            <?php echo htmlspecialchars($question['option1']); ?>
+                        </label><br>
+                        <label>
+                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="<?php echo htmlspecialchars($question['option2']); ?>">
+                            <?php echo htmlspecialchars($question['option2']); ?>
+                        </label><br>
+                        <label>
+                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="<?php echo htmlspecialchars($question['option3']); ?>">
+                            <?php echo htmlspecialchars($question['option3']); ?>
+                        </label><br>
+                    <?php elseif ($question['question_type'] === "Vrai/Faux"): ?>
+                        <label>
+                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="vrai" required>
+                            Vrai
+                        </label><br>
+                        <label>
+                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="faux">
+                            Faux
+                        </label><br>
+                    <?php elseif ($question['question_type'] === "Ouverte"): ?>
+                        <label>
+                            <input type="text" name="answer[<?php echo $question['id']; ?>]" placeholder="Votre réponse" required>
+                        </label><br>
+                    <?php endif; ?>
+                </div>
+            <?php endwhile; ?>
+            <button type="submit" class="btn"><img src="../images/save.png" alt="envoyer les réponses" width="50px"></button>
+        </form>
     </div>
 </body>
 </html>
