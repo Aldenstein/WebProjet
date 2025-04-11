@@ -182,15 +182,15 @@ if ($total_questions === 0) {
                     <p><strong><?php echo htmlspecialchars($question['question_text']); ?></strong></p>
                     <?php if ($question['question_type'] === "QCM"): ?>
                         <label>
-                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="<?php echo htmlspecialchars($question['option1']); ?>" required>
+                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="1" required>
                             <?php echo htmlspecialchars($question['option1']); ?>
                         </label><br>
                         <label>
-                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="<?php echo htmlspecialchars($question['option2']); ?>">
+                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="2">
                             <?php echo htmlspecialchars($question['option2']); ?>
                         </label><br>
                         <label>
-                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="<?php echo htmlspecialchars($question['option3']); ?>">
+                            <input type="radio" name="answer[<?php echo $question['id']; ?>]" value="3">
                             <?php echo htmlspecialchars($question['option3']); ?>
                         </label><br>
                     <?php elseif ($question['question_type'] === "Vrai/Faux"): ?>
@@ -290,3 +290,46 @@ if ($total_questions === 0) {
     </script>
 </body>
 </html>
+
+<?php
+while ($row = $result->fetch_assoc()) {
+    $question_id = $row['id'];
+    $correct_answer = trim($row['correct_option']); // Réponse correcte (1, 2 ou 3)
+
+    // Vérifier si l'utilisateur a répondu à cette question
+    if (isset($user_answers[$question_id])) {
+        $user_answer = trim($user_answers[$question_id]); // Réponse de l'utilisateur
+
+        if ($user_answer === $correct_answer) {
+            $score++;
+            $feedback[] = [
+                'question_id' => $question_id,
+                'result' => 'Correct'
+            ]; // Réponse correcte
+        } else {
+            $feedback[] = [
+                'question_id' => $question_id,
+                'result' => 'Incorrect'
+            ]; // Réponse incorrecte
+        }
+    } else {
+        $feedback[] = [
+            'question_id' => $question_id,
+            'result' => 'Pas de réponse'
+        ]; // Pas de réponse
+    }
+}
+
+if ($question_type === "QCM") {
+    // Récupérer les options QCM
+    $option1 = isset($_POST['option1']) ? trim($_POST['option1']) : '';
+    $option2 = isset($_POST['option2']) ? trim($_POST['option2']) : '';
+    $option3 = isset($_POST['option3']) ? trim($_POST['option3']) : '';
+    $correct_option = isset($_POST['correct_optio']) ? trim($_POST['correct_optio']) : '';
+
+    // Vérifier que la réponse correcte est un indice valide (1, 2 ou 3)
+    if (!in_array($correct_option, ['1', '2', '3'])) {
+        die("La réponse correcte doit être 1, 2 ou 3.");
+    }
+}
+?>
