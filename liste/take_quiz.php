@@ -32,7 +32,10 @@ if (!isset($_GET['quiz_id']) || !is_numeric($_GET['quiz_id'])) {
 $quiz_id = (int)$_GET['quiz_id'];
 
 // Récupérer les questions du quiz
-$sql_questions = "SELECT id, question_text, question_type, option1, option2, option3, correct_option FROM questions WHERE quiz_id = ?";
+$sql_questions = "SELECT id, question_text, question_type, option1, option2, option3, correct_option 
+                  FROM questions 
+                  WHERE quiz_id = ? 
+                  ORDER BY id ASC"; // Tri par ID croissant
 $stmt_questions = $conn->prepare($sql_questions);
 
 // Vérifier la requête
@@ -45,6 +48,8 @@ $stmt_questions->bind_param("i", $quiz_id);
 $stmt_questions->execute();
 $result_questions = $stmt_questions->get_result();
 
+error_log("Nombre de questions récupérées : " . $result_questions->num_rows);
+
 $total_questions = $result_questions->num_rows;
 
 // Vérifier si des questions existent
@@ -52,6 +57,19 @@ if ($total_questions === 0) {
     echo "<script>alert('Aucune question trouvée pour ce quiz.');</script>";
     exit;
 }
+
+// Récupérer une question spécifique
+$sql_specific_question = "SELECT * FROM questions WHERE id = 20 AND quiz_id = ?";
+$stmt_specific_question = $conn->prepare($sql_specific_question);
+
+if (!$stmt_specific_question) {
+    echo "<script>alert('Erreur lors de la préparation de la requête spécifique : " . $conn->error . "');</script>";
+    exit;
+}
+
+$stmt_specific_question->bind_param("i", $quiz_id);
+$stmt_specific_question->execute();
+$result_specific_question = $stmt_specific_question->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -148,6 +166,10 @@ if ($total_questions === 0) {
         .card h1{
             font-size: 2rem;
         }
+
+        .question {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -178,6 +200,7 @@ if ($total_questions === 0) {
         <!-- Formulaire du quiz -->
         <form id="quizForm" action="take_quiz_submit.php?quiz_id=<?php echo $quiz_id; ?>" method="POST" data-total-questions="<?php echo $total_questions; ?>">
             <?php while ($question = $result_questions->fetch_assoc()): ?>
+                <?php error_log("Question ID: " . $question['id']); // Log pour chaque question ?>
                 <div class="question" style="display: none;">
                     <p><strong><?php echo htmlspecialchars($question['question_text']); ?></strong></p>
                     <?php if ($question['question_type'] === "QCM"): ?>
@@ -292,40 +315,44 @@ if ($total_questions === 0) {
 </html>
 
 <?php
-while ($row = $result->fetch_assoc()) {
-    $question_id = $row['id'];
-    $correct_answer = trim($row['correct_option']); // Réponse correcte (1, 2 ou 3)
+// Vérifier si le résultat des questions est défini
+if (isset($result_questions)) {
+    while ($row = $result_questions->fetch_assoc()) {
+        $question_id = $row['id'];
+        $correct_answer = trim($row['correct_option']); // Réponse correcte (1, 2 ou 3)
 
-    // Vérifier si l'utilisateur a répondu à cette question
-    if (isset($user_answers[$question_id])) {
-        $user_answer = trim($user_answers[$question_id]); // Réponse de l'utilisateur
+        // Vérifier si l'utilisateur a répondu à cette question
+        if (isset($user_answers[$question_id])) {
+            $user_answer = trim($user_answers[$question_id]); // Réponse de l'utilisateur
 
-        if ($user_answer === $correct_answer) {
-            $score++;
-            $feedback[] = [
-                'question_id' => $question_id,
-                'result' => 'Correct'
-            ]; // Réponse correcte
+            if ($user_answer === $correct_answer) {
+                $score++;
+                $feedback[] = [
+                    'question_id' => $question_id,
+                    'result' => 'Correct'
+                ]; // Réponse correcte
+            } else {
+                $feedback[] = [
+                    'question_id' => $question_id,
+                    'result' => 'Incorrect'
+                ]; // Réponse incorrecte
+            }
         } else {
             $feedback[] = [
                 'question_id' => $question_id,
-                'result' => 'Incorrect'
-            ]; // Réponse incorrecte
+                'result' => 'Pas de réponse'
+            ]; // Pas de réponse
         }
-    } else {
-        $feedback[] = [
-            'question_id' => $question_id,
-            'result' => 'Pas de réponse'
-        ]; // Pas de réponse
     }
 }
 
-if ($question_type === "QCM") {
+// Vérifier le type de question pour le QCM
+if (isset($question_type) && $question_type === "QCM") {
     // Récupérer les options QCM
-    $option1 = isset($_POST['option1']) ? trim($_POST['option1']) : '';
-    $option2 = isset($_POST['option2']) ? trim($_POST['option2']) : '';
-    $option3 = isset($_POST['option3']) ? trim($_POST['option3']) : '';
-    $correct_option = isset($_POST['correct_optio']) ? trim($_POST['correct_optio']) : '';
+    $option1 = isset($_POST['option1']) ? trim(htmlspecialchars($_POST['option1'])) : '';
+    $option2 = isset($_POST['option2']) ? trim(htmlspecialchars($_POST['option2'])) : '';
+    $option3 = isset($_POST['option3']) ? trim(htmlspecialchars($_POST['option3'])) : '';
+    $correct_option = isset($_POST['correct_option']) ? trim($_POST['correct_option']) : '';
 
     // Vérifier que la réponse correcte est un indice valide (1, 2 ou 3)
     if (!in_array($correct_option, ['1', '2', '3'])) {
