@@ -6,54 +6,54 @@ Ce projet avait pour but de réaliser un système de quizz interactif avec une i
 
 ## Arborescence du projet : 
 
-WebProjet/
-├── index.html
-├── style.css
-├── script.js
-├── auth.php
-├── images/
-│   ├── icone.jpg
-│   ├── send.png
-│   ├── podium.png
-│   ├── Add User.png
-│   ├── homedeco.jpg
-│   ├── home.jpg
-│   ├── deco.jpg
-│   ├── plus2.png
-│   ├── edit.png
-│   ├── save.png
-│   ├── pin.jpg
-│   ├── poubelle.png
-│   ├── plus.png
-├── creation/
-│   ├── creation.html
-│   ├── creation.php
-│   ├── creation.css
-│   ├── creation.js
-│   ├── crea.sql
-├── classement/
-│   ├── classement.php
-│   ├── classement.css
-├── liste/
-│   ├── liste.html
-│   ├── liste.css
-│   ├── take_quiz.php
-│   ├── take_quiz.css
-│   ├── take_quiz_submit.php
-│   ├── take_quiz_submit.css
-│   ├── quiz_login.php
-├── deco/
-│   ├── deco.html
-│   ├── deco.css
-├── admin/
-│   ├── admin.html
-│   ├── admin.css
-├── invalide/
-│   ├── invalide.html
-│   ├── invalide.css
-├── modifier/
-│   ├── modifier.html
-│   ├── modifier.php
-│   ├── modifier.css
-│   ├── onglet.html
-____________________
+WebProjet/  
+├── index.html  
+├── style.css  
+├── script.js  
+├── auth.php  
+├── images/  
+│   ├── icone.jpg  
+│   ├── send.png  
+│   ├── podium.png  
+│   ├── Add User.png  
+│   ├── homedeco.jpg  
+│   ├── home.jpg  
+│   ├── deco.jpg  
+│   ├── plus2.png  
+│   ├── edit.png  
+│   ├── save.png  
+│   ├── pin.jpg  
+│   ├── poubelle.png  
+│   ├── plus.png  
+├── creation/  
+│   ├── creation.html  
+│   ├── creation.php  
+│   ├── creation.css  
+│   ├── creation.js  
+│   ├── crea.sql  
+├── classement/  
+│   ├── classement.php  
+│   ├── classement.css  
+├── liste/  
+│   ├── liste.html  
+│   ├── liste.css  
+│   ├── take_quiz.php  
+│   ├── take_quiz.css  
+│   ├── take_quiz_submit.php  
+│   ├── take_quiz_submit.css  
+│   ├── quiz_login.php  
+├── deco/  
+│   ├── deco.html  
+│   ├── deco.css  
+├── admin/  
+│   ├── admin.html  
+│   ├── admin.css  
+├── invalide/  
+│   ├── invalide.html  
+│   ├── invalide.css  
+├── modifier/  
+│   ├── modifier.html  
+│   ├── modifier.php  
+│   ├── modifier.css  
+│   ├── onglet.html  
+____________________  
